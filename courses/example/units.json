@@ -1,0 +1,108 @@
+{
+  "course": "example",
+  "title": "Example Course",
+  "share": 10,
+  "default_priority": 5,
+  "sources": [
+    "courses/example/sources/binary-search-notes.md: short original notes written for this example; the only reading in the course."
+  ],
+  "notes": "A one-unit course that shows the format. Replace it with your own courses (see skills/course/SKILL.md), or keep it to try a session end to end.",
+  "units": [
+    {
+      "id": "ex-binary-search",
+      "title": "Binary search",
+      "reading": {
+        "source": "courses/example/sources/binary-search-notes.md#Binary search: notes",
+        "status": "present"
+      },
+      "prereqs": [],
+      "placed": null,
+      "srs": {
+        "last_seen": null,
+        "reps": 0,
+        "lapses": 0,
+        "difficulty": 5.0,
+        "stability": 0.0
+      },
+      "cursor": {
+        "concept": null,
+        "note": null
+      },
+      "concepts": [
+        {
+          "id": "ex-bs-invariant",
+          "kind": "claim",
+          "claim": "Binary search is correct because it keeps an interval that must contain the target if it is present, and every step preserves that.",
+          "prereqs": [],
+          "state": "unknown",
+          "questions": [
+            "example-000001"
+          ]
+        },
+        {
+          "id": "ex-bs-log-steps",
+          "kind": "claim",
+          "claim": "Each step at least halves the interval, so the worst case is floor(log2 n) + 1 steps.",
+          "prereqs": [
+            "ex-bs-invariant"
+          ],
+          "state": "unknown",
+          "questions": [
+            "example-000002"
+          ]
+        },
+        {
+          "id": "ex-bs-interval-conventions",
+          "kind": "skill",
+          "claim": "the learner can write the half-open version (lo < hi; lo = mid + 1; hi = mid) without mixing it with the closed-interval updates.",
+          "prereqs": [
+            "ex-bs-invariant"
+          ],
+          "state": "unknown",
+          "questions": [
+            "example-000003"
+          ]
+        },
+        {
+          "id": "ex-bs-overflow",
+          "kind": "claim",
+          "claim": "Computing mid as lo + (hi - lo) / 2 avoids the integer overflow that (lo + hi) / 2 can cause.",
+          "prereqs": [
+            "ex-bs-interval-conventions"
+          ],
+          "state": "unknown",
+          "questions": [
+            "example-000004"
+          ]
+        },
+        {
+          "id": "ex-bs-lower-bound",
+          "kind": "claim",
+          "claim": "The lower-bound variant returns the first index not less than the target, which answers membership, insertion position and counting with one routine.",
+          "prereqs": [
+            "ex-bs-interval-conventions"
+          ],
+          "state": "unknown",
+          "questions": [
+            "example-000005"
+          ]
+        },
+        {
+          "id": "ex-bs-monotone-predicate",
+          "kind": "skill",
+          "claim": "the learner can recognize a problem as a search for the boundary of a monotone predicate and binary-search over the answer.",
+          "prereqs": [
+            "ex-bs-lower-bound",
+            "ex-bs-log-steps"
+          ],
+          "state": "unknown",
+          "questions": [
+            "example-000005"
+          ]
+        }
+      ],
+      "questions": [],
+      "log": []
+    }
+  ]
+}

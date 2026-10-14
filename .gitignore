@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+question_banks/.progress/
+.tmp_*

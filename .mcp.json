@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "anki": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@ankimcp/anki-mcp-server",
+        "--stdio"
+      ],
+      "env": {
+        "ANKI_CONNECT_URL": "http://localhost:8765"
+      }
+    },
+    "raindrop": {
+      "type": "http",
+      "url": "https://api.raindrop.io/rest/v2/ai/mcp"
+    }
+  }
+}
