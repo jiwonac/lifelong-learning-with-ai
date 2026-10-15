@@ -3,39 +3,26 @@
 This skill teaches what the learner needs to understand one thing they brought: a paper, an autoresearch or auto-litreview report, or a project need.
 Use it when the learner says "explain this", "I don't follow this report", "help me read <paper>", "what do I need to know to <task>", or "what's in my learn queue".
 
-An ad-hoc session is the vault's second kind of session, beside the curriculum session.
-It draws nothing from the scheduler, has no quiz, and studies no unit.
-It teaches the gaps in the learner's understanding of the material.
-Then it sorts each concept it taught into the systems that already exist: nowhere, a flashcard, a concept on an existing unit, or (on a repeat) a new unit.
-Nothing new is scheduled, so nothing here can build a backlog.
-
-Carding a paper the learner has already read and starred belongs to `skills/flashcards/SKILL.md` → "Work papers".
-This skill covers the reading around it: a first pass before the learner reads, or a debrief after.
+An ad-hoc session has no scheduler draw, quiz or study unit.
+Carding a paper belongs to `skills/flashcards/SKILL.md` → "Work papers"; this skill covers a first pass before the learner reads it, or a debrief after.
 
 ## Rules from the curriculum session
 
-Three rules from `skills/session/SKILL.md` apply unchanged:
-
-1. **Everything the learner reads goes in the artifact.** This includes the concept map and every explanation, question, answer, diagram and proposal. Chat carries turn-taking only.
-2. **Any duration must work.** The session ends when the learner says "gtg". The record's `cursor` makes stopping safe at any moment, and "continue" resumes from it.
-3. **Every question is generative.** No multiple choice.
-
-Teaching follows `skills/tutor/SKILL.md`, including its three layers: broad first, then narrow, then a synthesis round.
-In the narrow layer, use leading questions, one reasoning step at a time, split a failed step before re-explaining, and ask for the mechanism.
-A step that fails twice after splitting is a missing prerequisite; teach that first.
+The universal rules in `CLAUDE.md` apply.
+"gtg" ends the session at any moment, and "continue" resumes from the record's `cursor`.
+Teach as in `skills/tutor/SKILL.md`, including "Broad first, then narrow, then back to broad".
 
 ## Opening
 
-1. Run `python3 scripts/adhoc.py open`. If a session is open on the same material, say so and resume from its cursor unless the learner wants a fresh start.
-2. Otherwise, find the material without asking for anything the vault can reach. It is a file the learner names (usually in `courses/adhoc/sources/`), a URL, or the project need they describe. When the task concerns code the session can read, ask for the repository or file.
-3. Ask **one question in chat**: what the learner needs the material for. For a report, ask which conclusions they have to act on or judge. For a paper, ask whether they will read it themselves after this (first pass) or already have (debrief). For a project, ask what they need to be able to do.
+1. Run `python3 scripts/adhoc.py open`. If a session is open on the same material, resume from its cursor unless the learner wants a fresh start.
+2. Otherwise, find the material yourself: a file the learner names (usually in `courses/adhoc/sources/`), a URL, or the project need they describe. For a task about code, ask for the repository or file.
+3. Ask **one question in chat**: what the learner needs the material for. For a report, which conclusions they must act on or judge. For a paper, whether they will read it after this (first pass) or already have (debrief). For a project, what they need to be able to do.
 
-The answer sets the scope: the session teaches only what that goal depends on.
+The answer sets the scope: teach only what that goal depends on.
 
 ## 1. Map the concepts
 
-List the concepts the scoped material depends on, in prerequisite order.
-Check each against what the vault already knows about the learner:
+List the concepts the scoped material depends on, in prerequisite order, and check each against the vault:
 
 | evidence | treat as |
 |---|---|
@@ -43,43 +30,28 @@ Check each against what the vault already knows about the learner:
 | a card in the Vault deck (`findNotes`, `deck:Vault <term>`) | known: one-line reminder |
 | a concept with state `unseen` or `unknown`, or no trace | to teach |
 
-The vault's evidence is a guess.
-In the narrow pass (section 2), open each "to teach" concept with one quick generative check (state it, apply it); a correct answer moves it to known.
-This is the tutor's sweep, applied to a list derived from a document instead of a unit.
-
-Publish the map in the artifact before teaching: the goal, the known concepts with their reminders, and the concepts to teach in order.
-For a long document, hand the reading to a subagent and have it return the concepts, the claims that rest on each, and the passages that use them.
+In the narrow pass, open each "to teach" concept with one quick generative check; a correct answer moves it to known.
+Publish the map in the artifact before teaching: the goal, the known concepts with reminders, and the concepts to teach.
+For a long document, have a subagent return the concepts, the claims resting on each, and the passages using them.
 
 ## 2. Teach
 
-**Broad pass first.** Before any concept check, publish the material in plain words.
-Say what it does end to end in a few sentences, then each part's job: what it produces for the next part and what breaks without it.
-Use as little notation as possible.
-Place it relative to what the learner already studies: the vault units and courses it draws on or extends, found while mapping in section 1.
-Ask conceptual questions part by part: why a piece is needed, which choice follows from which fact, what a claim cannot tell you.
-Teach explicitly where the learner lacks the picture, and end every explicit block with a question that still costs effort.
-A long or machine-written document needs this most, because its notation is dense and it follows the author's order.
+1. **Broad pass.** Place the material among the vault units and courses it draws on or extends.
+2. **Narrow pass.** Teach the "to teach" concepts in order, down to the derivations the goal needs. Advance the record's cursor as each lands.
+3. **Synthesis round.** Include one question connecting the material to a related vault unit.
+4. **Goal question.** Ask the question the session existed to answer: what the report's main conclusion rests on, what the paper's contribution is, or how they would approach the task.
 
-**Then the narrow pass.** Teach the "to teach" concepts in prerequisite order, at the friction the checks expose, down to the derivations the goal needs.
-Advance the cursor in the record as each concept lands, and after each one say where it sits in the broad picture.
-
-**End with a synthesis round.** Before the goal question below, the learner reconstructs the whole chain, answers one question that spans several parts, and answers one that connects the material to a related vault unit.
-
-**Name a source for every explanation.** The tutor refuses to teach a unit whose reading is missing, because confident, plausible, unfalsifiable content is the worst possible failure.
-The same risk applies here.
-Each concept's explanation cites where it comes from: the material itself, a source in `courses/*/sources/`, the primary paper the material cites, or a standard reference fetched for the purpose.
+**Name a source for every explanation** (`CLAUDE.md` rule 4).
+Cite the material itself, a source in `courses/*/sources/`, the primary paper the material cites, or a standard reference fetched for the purpose.
 A concept explained from general knowledge alone is marked "unverified" in the artifact and is never carded.
 
-**Separate background from claims.** Teach established background (what a B-tree is, what a contrastive loss optimizes) as fact.
-Teach a finding of the material itself (a report's conclusion, a recent paper's result) as that source's claim, with its evidence and how far it can be trusted.
-This matters most for autoresearch output, which can be wrong.
-
-Close by returning to the goal.
-Ask the learner, generatively, the question the session existed to answer: what the report's main conclusion rests on, what the paper's contribution is, or how they would approach the task.
+**Separate background from claims.**
+Teach established background (what a B-tree is) as fact.
+Teach a finding of the material itself as that source's claim, with its evidence and how far to trust it.
 
 ## 3. Sort what was taught
 
-At "gtg", propose a destination for every concept taught, in the artifact, next to any flashcard proposals.
+At "gtg", propose a destination for every concept taught, in the artifact next to any flashcard proposals.
 The learner gets one feedback turn, as in `skills/flashcards/SKILL.md` → "At gtg".
 
 | the concept is | destination |
@@ -89,18 +61,15 @@ The learner gets one feedback turn, as in `skills/flashcards/SKILL.md` → "At g
 | part of what an existing unit covers | a new concept on that unit, plus flashcards |
 | taught in an earlier ad-hoc session too, with no unit to hold it | see "Promotion" |
 
-**Adding a concept to an existing unit.**
-A concept belongs on a unit only when the unit's reading covers it; a concept that merely relates to a course is flashcards-only.
+**Adding a concept to an existing unit**, only when the unit's reading covers it:
 
-1. Follow `skills/knowledge-map/SKILL.md` for the concept's `id`, `kind`, `claim` and `prereqs`, and insert it in sweep order.
-2. Set its state to `seen` only if the unit has been placed. Otherwise leave it `unknown`, and placement will judge it.
-3. Add one or two bank questions for it through `skills/bank-generator/SKILL.md` and list them in its `questions`.
-4. Append a unit `log` entry: the date, `what` = "ad-hoc session <slug> added <concept id>", `failed` empty.
-5. Leave `srs` and `cursor` alone; the unit itself was not reviewed.
+1. Write its `id`, `kind`, `claim` and `prereqs` per `skills/knowledge-map/SKILL.md`, and insert it in sweep order.
+2. Set its state to `seen` if the unit has been placed, otherwise `unknown`.
+3. Add one or two bank questions through `skills/bank-generator/SKILL.md` and list them in its `questions`.
+4. Append a unit `log` entry: `what` = "ad-hoc session <slug> added <concept id>", `failed` empty.
+5. Leave `srs` and `cursor` alone.
 
-**Flashcards** follow every rule in `skills/flashcards/SKILL.md` → "Writing a card", including the blind check.
-Only verified concepts are carded.
-Tags and source lines depend on where the card came from:
+**Flashcards** follow `skills/flashcards/SKILL.md` → "Writing a card", for verified concepts only.
 
 | card | tags | source line |
 |---|---|---|
@@ -109,15 +78,12 @@ Tags and source lines depend on where the card came from:
 | a paper's claim | `vault::paper::<slug>`, per "Work papers" | the paper, per "Work papers" |
 | a report's claim | `vault::report::<slug>`, with the topic tag when one applies | `Report: <report title>. (<YYYY-MM-DD>)` |
 
-Cards with a unit go to that course's subdeck, paper claims to `Vault::Papers`, and topic and report cards to `Vault::Ad hoc`.
-Create `Vault::Ad hoc` with the first such card; `scripts/anki_decks.py --apply` does this and gives it the Vault preset.
-A report-claim card asks what the report claims and never states it as fact, like a paper card.
-Most reports deserve no claim cards at all: card the background they taught, and card a claim only when the learner will cite it.
+Cards with a unit go to that course's subdeck, paper claims to `Vault::Papers`, and topic and report cards to `Vault::Ad hoc` (`scripts/anki_decks.py --apply` creates it with the Vault preset).
+A report-claim card asks what the report claims, like a paper card, and exists only for a claim the learner will cite.
 
 ## 4. Record
 
-Write `sessions/<YYYY-MM-DD-HHMM>-adhoc-<slug>.md`, where the slug names the material in a few kebab-case words.
-It opens with front matter, which `scripts/adhoc.py` reads and `scripts/check_vault.py` validates:
+Write `sessions/<YYYY-MM-DD-HHMM>-adhoc-<slug>.md` (slug: the material in a few kebab-case words) with this front matter:
 
 ```
 ---
@@ -132,60 +98,52 @@ cursor: inverted-file-index (IVF probing next)
 ```
 
 - `source_kind` is `paper`, `report`, `project` or `other`.
-- `topics` lists every concept taught, as short kebab-case topic names. Run `python3 scripts/adhoc.py topics` first and **reuse an existing name** whenever it fits, because promotion counts exact matches. Known concepts that only got a reminder are not topics.
-- `status` is `open` while the goal question is unanswered and the learner may come back, `done` otherwise. An open record needs `cursor`: the concept reached and what comes next.
+- `topics` lists every concept taught (not reminders) as kebab-case names. Run `python3 scripts/adhoc.py topics` first and **reuse an existing name** whenever it fits; promotion counts exact matches.
+- `status` is `open` while the goal question is unanswered and the learner may return, `done` otherwise.
 
-The body is the artifact converted to markdown: the goal, the concept map, the teaching with the learner's answers verbatim, the sources named, and the sorting with what the learner accepted (card note ids, concept ids, bank ids).
-Quote no more of an internal document than the explanation needs; the material itself lives on disk or at its URL.
+The body is the artifact as markdown, including the sources named and the accepted sorting (card note ids, concept ids, bank ids).
+Quote no more of an internal document than the explanation needs.
 
 Then ship as in `skills/session/SKILL.md` → "gtg", with PR title `adhoc-<slug>: <what was taught>`.
 
 ## Source-specific notes
 
-**A paper, before the learner reads it.** Teach the prerequisites the paper assumes and the problem it addresses.
-Then publish a short reading guide: the paper's question, where its contribution sits, and two or three questions to answer while reading.
-Do not teach the contribution itself; the learner's own reading does that.
+**A paper, before the learner reads it.** Teach its prerequisites and the problem it addresses, not the contribution.
+Then publish a reading guide: the paper's question, where its contribution sits, and two or three questions to answer while reading.
 Leave the record `open` with cursor "debrief after reading".
 
-**A paper, after the learner reads it.** Run a debrief: ask the questions a reading group would (`skills/flashcards/SKILL.md` → "Ask what a reading group would ask") and have the learner answer them.
-Teach where an answer fails.
-The debrief shows how well the learner holds the paper, so end by suggesting a star rating.
-If the learner agrees, continue straight into "Work papers" steps 3 to 7 with the debrief as the reading.
+**A paper, after the learner reads it.** Have the learner answer the questions in `skills/flashcards/SKILL.md` → "Ask what a reading group would ask", and teach where an answer fails.
+End by offering to card the paper, per "Work papers", with the debrief as the reading.
 
-**An autoresearch or litreview report.** Scope hard: these are dense, and most of their concepts are not on the path to the conclusions the learner needs.
-Before teaching any finding, check whether the report cites a source for it and say what that source is.
-Trace a finding the learner will rely on to the primary source during the session, and record in the artifact whether the source supports it.
+**An autoresearch or litreview report.** Scope hard to the conclusions the learner needs.
+Before teaching a finding, say what source the report cites for it.
+Trace a finding the learner will rely on to the primary source, and record in the artifact whether the source supports it.
 
-**A project need.** Work backwards from the task to the smallest set of concepts it requires.
-Use the project's own code, data or problem as the worked examples.
+**A project need.** Work backwards to the smallest set of concepts the task requires, using the project's own code, data or problem as examples.
 The session is done when the learner can say how they would do the task.
-Most project concepts sort to "nowhere" or flashcards.
 
 ## Promotion
 
-A topic deserves a home in `units.json` only once it comes back.
-`python3 scripts/adhoc.py topics` lists each topic with the dates of the sessions that taught it and flags those taught more than once.
-At "gtg", if a topic in this session is flagged and has no unit, propose a home alongside the other destinations:
+A topic gets a home in `units.json` only once it comes back.
+`python3 scripts/adhoc.py topics` flags topics taught in more than one session.
+At "gtg", propose a home for each flagged topic of this session that has no unit:
 
 - **An existing unit** whose reading covers it: add the concept as above.
-- **A new unit in an existing course**, when the topic belongs to the course and a source for it exists. Cut it with `skills/course/SKILL.md`.
-- **A new unit in `courses/adhoc/`**, the catch-all for topics with no course. The course has `share: 0`, so it is never drawn for study and the other shares need no change, and `default_priority: 5`. Unit ids start with `adhoc-`, so the recent course mix counts their curriculum sessions. Its units' questions are quizzed like any other unit's.
+- **A new unit in an existing course** that the topic belongs to, if a source exists, via `skills/course/SKILL.md`.
+- **A new unit in `courses/adhoc/`**, the catch-all (`share: 0`: quizzed, never drawn for study; `default_priority: 5`; unit ids start with `adhoc-`).
 
-A unit cut this way follows the normal unit rules:
+A promoted unit then:
 
-1. Its `reading` names a real source (a vault file, or the primary reference the sessions cited). The ad-hoc session records go in `also_read`.
-2. Cut its concepts from what the sessions taught plus what the source covers.
-3. Place it with the taught concepts `seen` and the rest `unseen`.
-4. Record one review with `python3 scripts/review.py <course>:<unit-id> partial --seen <taught concept ids>`, so its questions start entering the quiz.
-5. Retag its `vault::topic::<topic>` cards with the unit and concept tags (`replaceTags`).
-6. Run `python3 scripts/anki_decks.py --apply` to move them into the course's subdeck.
+1. Gets a `reading` naming a real source (a vault file, or the primary reference the sessions cited), with the ad-hoc session records in `also_read`.
+2. Gets concepts cut from what the sessions taught plus what the source covers.
+3. Is placed with the taught concepts `seen` and the rest `unseen`.
+4. Gets one review via `python3 scripts/review.py <course>:<unit-id> partial --seen <taught concept ids>`, so its questions enter the quiz.
+5. Has its `vault::topic::<topic>` cards retagged with the unit and concept tags (`replaceTags`).
+6. Has those cards moved with `python3 scripts/anki_decks.py --apply`.
 
-A unit in `courses/adhoc/` that grows into a subject of its own moves to a real course, through `skills/course/SKILL.md`.
+A `courses/adhoc/` unit that grows into a subject moves to a real course via `skills/course/SKILL.md`.
 
 ## The learn queue
 
-`courses/adhoc/sources/` is the ad-hoc learn queue: the learner drops papers, articles, reports or notes there to study later.
-Nothing surfaces the queue unless the learner asks; the curriculum session never mentions it, so it cannot become a debt.
-
-When the learner asks what is in it, list the files in `courses/adhoc/sources/` (excluding `README.md`) that have no ad-hoc session record with `status: done` whose `source` names them.
-Show one line each and let the learner pick.
+Surface the learn queue (`courses/adhoc/sources/`) only when the learner asks.
+List the files there (excluding `README.md`) that no `status: done` ad-hoc record names as its `source`, one line each, and let the learner pick.

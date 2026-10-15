@@ -371,7 +371,7 @@ Append-only: sessions refer to questions by `id`, so only rewrite an entry to fi
 
 - **Every question is generative.** No multiple choice.
 - **Factual recall is a question type.** A definition or theorem statement to memorize becomes a question that asks for it ("Define X", "What does Y mean in the definition of Z?", "Contrast the definitions of A and B"). Its spacing comes from the unit's SRS. Anki flashcards are a separate, optional, lighter layer (`skills/flashcards/SKILL.md`).
-- `topic` is the id prefix (often the course name without hyphens); `course` is the directory slug. `check_vault.py` requires both.
+- `course` is the directory slug and is required. `topic` is the id prefix, often the course name without hyphens.
 - `type` is a loose tag, not a fixed list (see `skills/bank-generator/SKILL.md`).
 - `answer_key` must let a grader check an answer without the source.
 - `grading_notes` is optional: other acceptable framings, common near-misses.

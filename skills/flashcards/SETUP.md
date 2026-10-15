@@ -1,52 +1,43 @@
 # Flashcard setup: Anki
 
-The flashcard layer is optional.
-Without it, sessions skip every flashcard step and nothing else changes.
-You do this setup once.
-
+This one-time setup is optional.
 Claude Code must run on the same machine as Anki desktop, because the `anki` MCP server talks to AnkiConnect on `localhost`.
-On macOS and Linux, run Claude Code natively and skip step 2.
-On Windows, run Claude Code natively, or in WSL2 with step 2.
+Step 2 is only for Claude Code in WSL2 on Windows.
 
 ## 1. Anki
 
 1. Install Anki desktop.
-   To review on a phone, sign in to AnkiWeb (Sync button), install AnkiDroid or AnkiMobile or use ankiweb.net in a browser, and sync once so all of them share one collection.
+   For phone review, sign in to AnkiWeb (Sync button), use AnkiDroid, AnkiMobile or ankiweb.net, and sync once.
 2. Install the **AnkiConnect** add-on: Tools → Add-ons → Get Add-ons → code `2055492159`.
-   Quit Anki completely and reopen it, because add-ons load only at startup.
-   To check it loaded, open <http://localhost:8765> in a browser on the same machine; it should say `AnkiConnect`.
+   Quit Anki completely and reopen it, because add-ons load only at startup (also the first fix whenever the agent cannot reach AnkiConnect).
+   <http://localhost:8765> should then say `AnkiConnect`.
 3. Create a deck named **`Vault`**.
 4. Open the `Vault` deck options and give it its own preset (call it `Vault`):
-   - **FSRS:** on. The toggle is in the **FSRS** section near the bottom of the options page. It applies to the whole collection, not only this preset.
+   - **FSRS:** on (bottom of the page; it applies to the whole collection).
    - **Desired retention:** `0.80`
    - **New cards/day:** `8`
-   - **Maximum reviews/day:** `100`. That is roughly 10–13 minutes at 6–8 s per card, deliberately below a 15-minute budget to keep the daily load light. Lower it if a day runs long.
+   - **Maximum reviews/day:** `100` (about 10–13 minutes at 6–8 s per card). Lower it if a day runs long.
    - **Leech threshold:** `4`
    - **Leech action:** `Suspend Card`
-   - **Display order → New card sort order:** a random option, for example `Random note, then card type`, so new cards from different sources interleave.
-   - Leave the rest at their defaults. After about a month of reviews, press **Optimize** under FSRS so it fits your own memory.
+   - **Display order:** New card gather order `Random cards`; New card sort order random, for example `Random note, then card type`.
+   - Leave the rest at their defaults. After about a month of reviews, press **Optimize** under FSRS.
 5. The agent styles the `Basic` and `Cloze` note types itself (Tools → Manage Note Types → Basic / Cloze → Cards → Styling).
-   Besides Anki's default rules, it adds three classes that the card fields use.
-   They use opacity and font instead of a fixed colour, so they stay readable in night mode:
+   It adds three classes to Anki's default rules, using opacity rather than colour so they work in night mode:
 
    ```css
    .src  { font-size: 0.65em; opacity: 0.6; }   /* source line on the front */
    .expl { font-size: 0.8em;  opacity: 0.6; }   /* easy explanation on the back */
    .ttl  { font-family: Georgia, "Times New Roman", serif; font-style: italic; }  /* paper title in a question */
    ```
-6. The agent sorts cards into subdecks of `Vault` (`Vault::Courses::<course>`, `Vault::Papers`, later `Vault::Ad hoc`) with `scripts/anki_decks.py`, and gives each new subdeck the `Vault` preset.
-   Anki gives every deck its own preset, and a subdeck does not inherit its parent's.
-   To schedule one kind of card differently, give its subdeck(s) a new preset (for every course, assign the same preset to each `Vault::Courses::` deck).
-   When you study by clicking `Vault`, its own daily limits cap the total across all subdecks, and each subdeck's limits cap its share.
-   New cards are gathered in random order (**Display order → New card gather order: Random cards**), so subdecks mix evenly.
-   A definition card is therefore not guaranteed to come before the cards that use it, so the agent writes every card to be answerable on its own.
+6. The agent sorts cards into subdecks of `Vault` with `scripts/anki_decks.py` (see `SKILL.md` → "Plumbing") and gives each new subdeck the `Vault` preset, because a subdeck does not inherit its parent's preset.
+   To schedule one kind of card differently, give its subdeck(s) a new preset (for courses, every `Vault::Courses::` deck).
+   Studying from `Vault` caps the total by `Vault`'s limits and each subdeck's share by its own.
 
 ## 2. Only if Claude Code runs in WSL: let WSL reach Windows' localhost
 
-AnkiConnect listens on Windows `localhost:8765`.
-WSL2 can see it only in **mirrored** networking mode, which needs Windows 11 22H2 or later.
+WSL2 can see Windows' AnkiConnect only in **mirrored** networking mode, which needs Windows 11 22H2 or later.
 
-Open `.wslconfig` in your Windows user folder (`%UserProfile%\.wslconfig`; VS Code works) and add this under `[wsl2]`, keeping any lines already there:
+Add this to `%UserProfile%\.wslconfig`, keeping any lines already there:
 
 ```ini
 [wsl2]
@@ -54,16 +45,14 @@ networkingMode=mirrored
 ```
 
 **Save it as UTF-8.**
-WSL silently ignores a `.wslconfig` saved as UTF-16 (VS Code shows `UTF-16 LE` in the status bar) and stays in NAT mode.
-In VS Code, click the encoding in the status bar → Save with Encoding → UTF-8.
-From WSL, this command converts a UTF-16 file and keeps a backup (do not run it on a file that is already UTF-8):
+WSL silently ignores a UTF-16 file (VS Code shows `UTF-16 LE` in the status bar; fix it with Save with Encoding → UTF-8).
+From WSL, this converts a UTF-16 file and keeps a backup (not for a file already in UTF-8):
 
 ```bash
 f=/mnt/c/Users/<windows-user>/.wslconfig; cp $f $f.bak && iconv -f utf-16 -t utf-8 $f.bak > $f
 ```
 
-Then run `wsl --shutdown` **in PowerShell** and reopen your WSL distribution.
-This also ends any Claude Code session running in WSL, including the desktop app's, so reopen it afterwards.
+Then run `wsl --shutdown` **in PowerShell**, and reopen WSL and any Claude Code session it ended.
 Check that the change took:
 
 ```bash
@@ -71,29 +60,24 @@ wslinfo --networking-mode
 ```
 
 It should print `mirrored`.
-If `.wslconfig` also has `localhostForwarding=true`, WSL warns at startup that the setting has no effect in mirrored mode.
-That warning is harmless.
+A startup warning that `localhostForwarding=true` has no effect in mirrored mode is harmless.
 
 **Fallback** if mirrored mode is unavailable or flaky:
-1. In Anki, open Tools → Add-ons → AnkiConnect → Config and set `"webBindAddress": "0.0.0.0"`.
-   Allow Anki through the Windows firewall on private networks.
+1. In Anki's AnkiConnect config (Tools → Add-ons), set `"webBindAddress": "0.0.0.0"`, and allow Anki through the Windows firewall on private networks.
 2. In `.mcp.json`, set `ANKI_CONNECT_URL` to `http://<windows-ip>:8765`.
-   To find the Windows IP, run `ip route | awk '/default/ {print $3}'` in WSL.
+   The Windows IP comes from `ip route | awk '/default/ {print $3}'` in WSL.
 
 ## 3. Check it
 
-With Anki open, run this where Claude Code runs:
+With Anki open, run this where Claude Code runs; it should print `{"result": 6, "error": null}`.
 
 ```bash
 curl -s localhost:8765 -X POST -d '{"action":"version","version":6}'
 ```
 
-It should print `{"result": 6, "error": null}`.
-
 ## 4. Node 22+
 
-The MCP server runs through `npx` and needs Node 22 or later.
-Many distributions package an older Node; nvm is one way to get a current one:
+The MCP server runs through `npx` and needs Node 22 or later, which nvm can install:
 
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
@@ -103,20 +87,17 @@ nvm install 22
 
 ## 5. Open the repo in Claude Code
 
-You need `git`, `python3` and, for the "gtg" merge step, the GitHub CLI `gh` logged in to the account that owns your copy of the repo.
+You need `git`, `python3` and the GitHub CLI `gh`, logged in to the account that owns your copy of the repo.
 
 ```bash
 gh auth login            # lets "gtg" open and merge PRs
 cd <your-clone> && claude
 ```
 
-The first time you start Claude Code in the repo, approve the project MCP server **`anki`**.
-Then run `/mcp` and check that it shows as connected.
+On first start, approve the project MCP server **`anki`**, then check `/mcp` shows it connected.
 
 ## 6. Daily use
 
-- Open Anki desktop before a session, or at least before you say "gtg", so the agent can add and sync new cards.
-- Review on any device, whenever you like. The agent never schedules your reviews.
-- Cloud sessions, and any session where Anki is unreachable, still work for studying; they skip every flashcard step.
-  A cloud container cannot reach Anki on your machine, and AnkiWeb's terms rule out third-party sync clients, so the only way around this is to run the session locally.
-- If the agent cannot reach AnkiConnect right after you install it, quit Anki completely and start it again. The add-on does not load until Anki has fully restarted.
+- Open Anki desktop before you say "gtg", so the agent can add and sync new cards.
+- Review on any device, whenever you like.
+- Cloud sessions cannot reach Anki, and AnkiWeb's terms rule out third-party sync clients, so card work needs a local session.
