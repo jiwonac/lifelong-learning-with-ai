@@ -16,8 +16,7 @@ per session.
   machine), never from a cloud session. Setup: `skills/flashcards/SETUP.md`.
 - **One deck tree, `Vault`, note types `Basic` and `Cloze`.** `Cloze` (fields `Text`, `Back Extra`) is
   for lists, two-sided contrasts, and facts a sentence makes clearer (see "Writing a card"). No
-  decks outside `Vault`, no reversed cards. The vocabulary deck is the one exception (see
-  "Vocabulary").
+  decks outside `Vault`, no reversed cards.
 - **Subdecks by kind of card**, so each kind can get its own deck options. A card goes in exactly
   one; its tags are unchanged by where it sits.
 
@@ -26,7 +25,6 @@ per session.
   | `Vault::Courses::<course title>` | cards from course sessions, named by the course `title` in `units.json` |
   | `Vault::Papers` | every claim attributed to a work paper |
   | `Vault::Ad hoc` | explain-session cards with no unit (`skills/explain/SKILL.md`), created with its first card |
-  | `Vault::Vocabulary` | English vocabulary notes and their contrast cards (tag `vault::vocab`, see "Vocabulary") |
 
   For a card that fits two, judge which kind it is. A paper's claim (its front names the paper
   in a `ttl` span) goes to Papers even with a course tag on it. A plain-fact definition carded
@@ -334,85 +332,6 @@ it. This is its own short session. There is no quiz and no study unit, and nothi
    beyond the cards. The papers may be internal, and Raindrop is where they live. Then do "gtg"
    as usual. The PR title is `paper-<slug>: <n> cards`, and there is no `units.json` log entry.
 
-## Vocabulary
-
-An English vocabulary deck for reading and writing: words that are nontrivial but still used in
-demanding modern nonfiction (science, philosophy, social science) and literary modern fiction.
-Capricious, precocious, flummoxed, sanguine and obstinate are at the right level; vouchsafe is
-too obscure. It is a deck only, with no course, no unit and no bank. The rules in "Writing a
-card" apply except where this section says otherwise.
-
-**Trigger:** "vocab batch", "more words", "sort words", "card my words", or anything like it.
-This is its own short session, local only, like "Work papers".
-
-### Note type
-
-One `Vault Vocabulary` note per word makes two cards, word → meaning (for reading) and meaning →
-word (for writing). This is the exception to "no reversed cards": a word known only one way is
-half learned. Fields:
-
-| field | holds | shown |
-|---|---|---|
-| `Word` | the word's most common form (`flummoxed`, not `flummox`) | front of word → meaning, back of meaning → word |
-| `Meaning` | the shortest definition that is still right ("clear like water"); several senses as `<ol>`, each led by a short label: `<li>(feeling) optimistic, esp. when things look bad</li>` | back of word → meaning, front of meaning → word |
-| `Senses` | only for a word with several senses carded: the labels as blanks, `1. (feeling) ___ 2. (color) ___` | front of word → meaning |
-| `Cue` | only when the meaning alone has several right answers: a hint that rules the others out without giving the word away (part of speech, register, "Latin for blood") | front of meaning → word |
-| `Notes` | the learning aids, at the bottom of both backs | both backs |
-
-Card every sense the learner is likely to meet, in one note; never split senses across notes.
-`Notes` holds, in this order and only what helps this word: its connotation and register
-(pejorative, formal, literary, usually of people), one example sentence in `<i>…</i>`, then
-whichever of etymology, an image, or the near-synonym it is confused with makes it stick. Keep it
-to about 20–50 words. The agent writes the example sentences; they show typical modern use.
-
-**The front still determines the back.** For meaning → word, write down the strongest other
-word that fits the `Meaning` (abjure, forswear, recant, repudiate) and make the `Meaning` or the
-`Cue` rule it out. The blind check in "At gtg" runs on the meaning → word fronts.
-
-**Contrast cards** for confusable pairs (obdurate and obstinate, sanguine and sanguinary) are
-`Cloze` notes in the same deck with two deletions, one per side, as in "Writing a card". Make one
-whenever a new word has a well-known confusable twin, even when the twin is not in the deck.
-
-Every vocabulary note and contrast card gets the tag `vault::vocab`, and nothing else.
-
-### Where the words come from
-
-`scripts/vocab.py` (its docstring has the details) keeps a pool of candidates drawn from public
-SAT, GRE and word-of-the-day lists in `vocabulary/sources/`, filtered to Zipf 1.9–3.2 on the
-most common form. The learner sorts each batch on the sorting page, an artifact with four keys:
-
-| key | verdict | carded |
-|---|---|---|
-| 1 | new to me, add | yes |
-| 2 | never seen it anywhere (too obscure) | no |
-| 3 | I know it, add (for active use) | yes |
-| 4 | I know it, too easy | no |
-
-Key 1 means the learner has at least vaguely seen the word somewhere; key 2 means never once.
-Exposure is personal, so 2s fall at every frequency in the band (a 2 such as ebullient or
-quotidian can score the same as the adds). Only move the band when a batch is
-dominated by one key: mostly 4s, lower `--hi`; 2s concentrated below Zipf 2.2, raise `--lo`.
-
-1. **Make a batch.** `python3 scripts/vocab.py next 100 > vocabulary/batches/<YYYY-MM-DD>.json`.
-   Add `p` (part of speech) and `d` (a one-line definition, the main sense first) to every
-   entry. Drop entries that are not real headwords, proper nouns, or plain inflections of a word
-   already in the batch.
-2. **Publish it.** `python3 scripts/vocab.py page vocabulary/batches/<file>`, then publish
-   `vocabulary/sort.html` to the artifact URL in `flashcards.json` → `vocab_sorter` (read it
-   first; on the very first publish, declare `capabilities: {db: {}, user: {}}` and save the new
-   URL there). Chat says only that the batch is up.
-3. **Read the verdicts** when the learner says it is sorted: `ArtifactData` `list` on the
-   `verdicts` collection, saved to a scratch file, then
-   `python3 scripts/vocab.py ingest <file>`. The page skips any word already judged, so a batch
-   can be sorted across several sittings.
-4. **Card the adds.** Draft notes for the words `ingest` reports as to card, run the blind check,
-   and propose them in an artifact for one feedback turn, as in steps 3–6 of "At gtg". Add them
-   (`addNotes`, deck `Vault::Vocabulary`, model `Vault Vocabulary`, tag `vault::vocab`), write each
-   note id into `vocabulary/words.json` as `note`, and sync.
-
-The learner sets this subdeck's scheduling (new cards per day, retention) themselves. New cards
-are gathered in random order across subdecks already, so vocabulary needs no `anki_mix.py`.
-
 ## Leeches → the quiz
 
 A card the learner keeps missing needs teaching, not more repetitions. Anki's leech threshold
@@ -434,9 +353,6 @@ A card the learner keeps missing needs teaching, not more repetitions. Anki's le
   Re-teach it the same way from the explain record in `sessions/` and the source it names, then
   rewrite or split the card and unsuspend it. A topic card that keeps coming back as a leech is
   a sign the topic needs a unit (`skills/explain/SKILL.md` → "Promotion").
-- A `vault::vocab` leech has no quiz either. The word needs a better hook, not more
-  repetitions: rewrite its `Notes` (a sharper example, the etymology, an image, or a contrast
-  card with the word it is being confused with), then unsuspend it.
 - Any other leech with no concept tag is a card that cannot be routed: put it in the next cleanup
   batch.
 
@@ -489,7 +405,7 @@ Kinds of card the learner suspended as useless. Never write these.
 To catch cards the learner would mark or suspend before they see them, a pass reviews the new
 (never-reviewed) cards in bulk. Run it when the learner asks, or after a large batch of cards.
 
-1. Dump the `deck:Vault is:new -is:suspended` notes, excluding vocabulary and today's cards,
+1. Dump the `deck:Vault is:new -is:suspended` notes, excluding today's cards,
    grouped by paper tag or unit tag, with each concept's state from `units.json`, into
    `all.json` in a scratch directory, and split the groups into chunks of about 90 notes.
 2. Hand each chunk to a subagent with `skills/flashcards/PREREVIEW.md` as its brief. Each
@@ -513,7 +429,7 @@ Candidates, each with a one-line reason:
 - cards that break the rules above (two facts, cloze-shaped, context-dependent wording, a front
   with more than one correct answer, an unprompted list of three or more);
 - cards whose unit was archived or whose concept no longer exists;
-- leeches with no concept, `vault::paper::`, `vault::topic::`, `vault::report::` or `vault::vocab` tag;
+- leeches with no concept, `vault::paper::`, `vault::topic::`, or `vault::report::` tag;
 - `vault::topic::` cards whose topic now has a unit (retag them with the unit and concept tags);
 - paper cards whose bookmark is no longer in Raindrop (the learner may have dropped the paper);
 - cards in the wrong subdeck, as reported by `python3 scripts/anki_decks.py`.

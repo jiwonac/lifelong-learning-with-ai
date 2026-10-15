@@ -5,7 +5,6 @@
                                      carded from a paper that a course concept covers
     Vault::Papers                    every claim attributed to a work paper
     Vault::Ad hoc                    explain-session cards with no unit (topic and report tags)
-    Vault::Vocabulary                English vocabulary notes and their contrast cards (`vault::vocab`)
 
 Subdecks exist so each kind of card can get its own deck options (new cards per day, desired
 retention). The tags stay as they are: they route leeches and drive cleanup, and the deck only
@@ -17,8 +16,6 @@ decides scheduling. The rule for a card that could sit in more than one deck:
      `vault::concept::` tag wins, because the concept is the narrower claim.
   3. Any other card with a paper tag goes to Papers.
   4. A card with only `vault::topic::` or `vault::report::` tags goes to Ad hoc.
-
-A vocabulary card (tag `vault::vocab`) goes to Vocabulary before any of these rules apply.
 
 The anki MCP server cannot set deck options, so this talks to AnkiConnect directly. A subdeck it
 creates gets the parent Vault deck's options preset, so moving a card changes nothing about how it
@@ -39,7 +36,6 @@ from pathlib import Path
 ROOT = "Vault"
 PAPERS = f"{ROOT}::Papers"
 ADHOC = f"{ROOT}::Ad hoc"
-VOCAB = f"{ROOT}::Vocabulary"
 URL = os.environ.get("ANKI_CONNECT_URL", "http://localhost:8765")
 COURSES = Path(__file__).resolve().parent.parent / "courses"
 
@@ -82,8 +78,6 @@ def concept_course(concept, prefixes):
 def target(note, decks, prefixes):
     """The deck a note belongs in, or None when its tags give no rule."""
     tags = note["tags"]
-    if "vault::vocab" in tags:
-        return VOCAB
     fields = note["fields"]
     front = (fields.get("Front") or fields.get("Text") or {"value": ""})["value"]
     paper = any(t.startswith("vault::paper::") for t in tags)

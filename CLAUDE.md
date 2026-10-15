@@ -1,194 +1,109 @@
-# Learning vault: agent guide
+# A Guide for the AI Agent
 
-This file is for the agent running the vault. `README.md` is for the learner and holds only what
-they need to use it; everything about how the vault works, what the rules are and what the files
-mean is here. When the two disagree, fix whichever is wrong rather than following either blindly.
+This file is primarily technical under-the-belly details for the AI agent running the learning vault. 
+If you're the learner, read `README.md` first. 
 
-The vault is a study system built from files and a few scripts, driven from Claude Code with write
-access to this repository. The learner brings the sources and does the reading; the vault decides
-what to study next, teaches at the point where understanding stops, quizzes what was covered
-before, and records the result.
+This vault uses flat files and a few Python scripts. 
+The learner brings the sources and may do the reading on their own. 
+The vault decides what to study next, teaches at the boundaries of understanding, quizzes what was learned before, and logs the sessions. 
 
-Two principles shape everything:
+The system's design follows two guiding principles:
 
-1. **Maximize struggle in the material and eliminate it everywhere else.** Difficulty in the ideas
-   is the point. Difficulty in deciding what to study, finding the source, checking whether a
-   claim is true, or tracking what has been covered is waste, and the vault absorbs it. If the
-   learner is thinking about the system, the system is malfunctioning.
-2. **Any duration must work.** Thirty minutes some days, three hours others, nothing for a
-   fortnight. Nothing accumulates a backlog, and no session needs reorientation to start.
+1. Desirable difficulty in the material; no friction elsewhere. The learner should struggle with the ideas and knowledge. The learner should not waste time deciding what to study, fact checking everything that the AI says, or doing bookkeeping. 
+2. Any source, any duration. The learner can bring a textbook with a full semester-long lesson plan, or a single one-off YouTube video. The learner may study for ten minutes or five hours in one sitting.
 
-## Where to start
+## SKILLs: Where to Start
 
-| the learner says | read |
-|---|---|
-| "let's do a session", "I've got an hour", "what's next" | `skills/session/SKILL.md` (it calls `place`, `grader` and `tutor`) |
+| the learner says                                                   | read |
+|--------------------------------------------------------------------|---|
+| "let's do a session", "I've got an hour", "what's next"            | `skills/session/SKILL.md` (it calls `place`, `grader` and `tutor`) |
 | "explain this", "help me read <paper>", "what's in my learn queue" | `skills/explain/SKILL.md` |
-| a new course, a reading list, new sources, re-cut units | `skills/course/SKILL.md`, then `skills/knowledge-map/SKILL.md` and `skills/bank-generator/SKILL.md` |
-| anything about Anki cards, work papers, vocabulary | `skills/flashcards/SKILL.md` (setup: `SETUP.md` beside it) |
-| "gtg", "I've got to go", "end session" | `skills/session/SKILL.md` → "gtg", at once, mid-question if need be |
+| a new course, a reading list, new sources, re-cut units            | `skills/course/SKILL.md`, then `skills/knowledge-map/SKILL.md` and `skills/bank-generator/SKILL.md` |
+| anything about Anki flashcards                                     | `skills/flashcards/SKILL.md` (setup: `SETUP.md` beside it) |
+| "gtg", "I've got to go", "end session"                             | `skills/session/SKILL.md` → "gtg", at once, mid-question if need be |
 
-## Rules that apply everywhere
+## Universal Rules
 
-- **Everything the learner reads goes in the session Artifact; chat carries turn-taking only.**
-  See "On the interface" below and `skills/session/SKILL.md`.
-- **Every question is generative.** No multiple choice anywhere.
-- **Teach broad, then narrow, then synthesize** (`skills/tutor/SKILL.md`).
-- **Refuse rather than improvise.** A unit whose reading is not in the vault is not taught from
-  memory; explain sessions name a source for every explanation.
-- **`scripts/review.py` is the only writer of SRS numbers.** Never hand-edit them.
-- **`scripts/check_vault.py` must report 0 errors** after any structural change and before any
-  merge.
-- **Three levels only**: course, unit, concept. Do not invent a fourth.
+1. **Everything the learner reads goes to the session Artifact.** Chat carries turn-taking only. 
+2. **Every question is generative.** No multiple choice anywhere. 
+3. **Teach broad, then narrow, then synthesize.** (See `skills/tutor/SKILL.md`.)
+4. **Refuse rather than improvise.** Do not teach from memory if the ground-truth reading is missing. 
+5. `scripts/review.py` **is the only writer of SRS numbers.** Never hand-edit them. 
+6. `scripts/check_vault.py` **must report 0 errors** after any structural change and before any merge. 
+7. **Three levels of abstraction only:** course, unit, concept. 
 
 ## How a session runs
 
-When the learner says "let's do a session" (or "I've got an hour", or "what's next"),
-`skills/session/SKILL.md` takes over. Every session is about **one unit**; if that unit is
-blocked by a prerequisite, the prerequisite becomes the unit, and that recursion is the whole
-curriculum.
+### Curriculum mode
 
-1. **Place** — if the unit has never been assessed, a few generative questions spread across its
-   concepts, then guess the rest. Placement errs low on purpose (`skills/place/SKILL.md`).
-2. **Quiz** — a handful of bank questions from other units, asked one at a time in the artifact
-   (`skills/grader/SKILL.md` marks and routes them).
-3. **Study** — give the unit's broad picture in plain words, sweep its concepts from the
-   `cursor`, fast, teach at the first friction while returning to the broad picture as each
-   concept lands, and close with a synthesis round (`skills/tutor/SKILL.md`).
-4. **Capture** — write `cursor`, concept states, `srs` and a `log` entry into `units.json`, and
-   the session artifact into `sessions/`. Saying "gtg" then commits, opens a PR and merges it
-   to `main`, gated on `check_vault.py` reporting zero errors.
+When the learner starts a learning session, `skills/session/SKILL.md` takes over.
+Every session is about **one unit**. 
+If that unit is blocked by a hard prerequisite, the prerequisite becomes the unit, recursively.
 
-**Every question in this vault is generative.** No multiple choice anywhere — recognition is what
-the learner's own reading is for.
+1. **Place:** If the unit has never been assessed, ask a few generative questions spread across its
+   concepts, then guess the rest. Placement errs low. (`skills/place/SKILL.md`)
+2. **Quiz:** Ask and grade a handful of bank questions from other units.
+   (`skills/grader/SKILL.md`)
+3. **Study:** First teach the unit's broad picture in plain words. Then, sweep its concepts from the
+   `cursor`, fast. Teach at the first friction while returning to the broad picture as each
+   concept lands. Close with a synthesis round. (`skills/tutor/SKILL.md`)
+4. **Capture:** Write `cursor`, concept states, `srs` and a `log` entry into `units.json`, and
+   the session artifact into `sessions/`. Then commit, open a PR and merge it
+   to `main`.
 
-**Repair is not a separate mechanism.** A concept that fails cold twice goes back to `unseen`,
+A concept that fails cold twice goes back to `unseen`,
 which drops its unit out of `learned` and returns it to the study pool on its own.
 
-### Ad hoc needs: explain sessions
+### Ad-hoc mode
 
-A paper the learner is about to read, an autoresearch report full of unfamiliar concepts, or a project
-task is not a unit, and the scheduler never sees it. When the learner says "explain this",
-`skills/explain/SKILL.md` runs instead: it maps the concepts the material depends on, skips the
-ones the vault shows the learner already has, and teaches the rest. At the end it sorts each concept
-taught into what already exists: nowhere, a flashcard, a concept on an existing unit, or, once a
-topic has come up in more than one explain session, a new unit. Nothing new is scheduled, so
-there is no ad hoc backlog. With the optional Raindrop integration, things to understand later
-wait under the `learn` tag in Raindrop, which nothing surfaces unless the learner asks.
+The learner may present you with an ad-hoc paper, article, report, project needs, or any other one-off learning goal that is not part of the existing curriculum. 
+In this scenario, use `skills/explain/SKILL.md` instead: it maps the concepts of the material, skips the ones that the vault shows the learner already has, and teaches the rest. 
+At the end, it sorts each concept taught into what already exists: nowhere, new flashcards, new concept in an existing unit, or if the topic has come up repeatedly, a new unit. 
 
-### What the scheduler actually does
+### Scheduler
 
-`scripts/session.py` is the entire scheduler. It computes one number per unit —
-
+`scripts/session.py` handles all scheduling. It computes an urgency score per unit. 
 ```
 t = days since srs.last_seen
 R = (1 + t / (9 · stability)) ^ -1        retrievability
 urgency = (1 − R) · priority
 ```
 
-— and draws from that one ranking twice:
+- **Quiz.** Units are sampled weighted by urgency without replacement. One question is chosen uniformly from that unit's askable set. Default 8 questions; use `-n` to change it. A unit is quiz-eligible only if its priority is above 0, its stage is `learning` or `learned`, and its prerequisites are met. A question is askable only if every concept it is attached to is `seen`. If the question is associated with no particular concept, it is askable as soon as the unit is quiz-eligible. 
+- **Study.** One unit is drawn in two stages. First, a _course_ is sampled by its `share` of the learner's curriculum-learning workload. For example, four courses might have shares 3, 3, 2, and 2; this means 30% of sessions will be the first course. Then, within that course, every unit that is not yet `learned`, has priority above 0, has its reading present in the vault, and has its prerequisites met is eligible. All eligible units are sampled in an urgency-weighted manner within the chosen course. 
 
-- **Quiz.** Units are sampled *weighted by urgency, without replacement* (not top-N: top-N would
-  serve the same handful every session and never interleave), then one question is chosen
-  uniformly from that unit's askable set. Default 8 questions; `-n` changes it. A unit is
-  quiz-eligible only if its priority is above 0, its stage is `learning` or `learned`, and its
-  prerequisites are met. A question is askable only if **every** concept it is attached to is
-  `seen` — or, for a question the unit owns that no concept claims, as soon as the unit itself is
-  quiz-eligible, there being no finer evidence to gate it on.
-- **Study.** One unit, drawn in **two stages**, from those that are not `learned`, have priority
-  above 0, have their reading present in the vault, and have their prerequisites met.
+**Clarifications:**
 
-  **Which course** comes first, and it is settled by `share` — a course-header field that reads as
-  *sessions out of ten*. For example, four courses might have shares 3, 3, 2 and 2; they sum to
-  10 on purpose so the numbers can be read straight off. A course with no eligible unit this
-  session holds no slot, and the remaining shares renormalise over whatever is left.
+- This system never computes due dates, so that scheduling is flexible to the learner's schedule. 
+- A new unit or an important unit is prioritized, but no unit is discarded, unless the learner explicitly sets its priority to zero. 
+- Each course has a default priority, and the learner can override per-unit priorities. This allows the learner to mute material that they are not interested in. Use a default course priority of 5 on a 10-point scale.
+- The course draw is i.i.d. across sessions. 
+- The second stage adds a small Gaussian to each unit's urgency before weighting, overridable per run with `--noise N`. It reorders units that are close in urgency, so that a small amount of randomness and serendipity is added to the learning schedule, which helps the learner stay engaged.
+- A prerequisite edge is satisfied once its source unit reaches `learning`. Suppose `B` depends on `A`, i.e. `A -> B`. The learner can start learning unit B once they have a partial grasp of unit A. This is how learning works in real life. 
 
-  **Which unit** comes second, urgency-weighted inside that course only. Splitting the draw is
-  what makes `share` mean what it says: a single weighted draw ties a course's frequency to how
-  many units it happens to have eligible, so an 80-unit course drowns a 25-unit one unless the
-  priorities are bent to compensate. Choosing the course first takes unit count out of the
-  question, and `priority` goes back to being only a within-course weight.
+**Design decisions:**
 
-`urgency` **ranks and never thresholds.** No due date is computed anywhere, which is why a
-three-week gap produces no debt — only a set of units that are all somewhat staler, in the same
-order. A unit that has never been reviewed has `R = 0`, so new material is maximally urgent among
-things that are eligible at all.
-
-**Priority is per unit**, defaulting to the course's `default_priority`, and it now says only how
-much this unit matters *against its own coursemates*. `0` still means never scheduled and never
-sampled — the way to mute material that is real but not wanted right now. Courses normally sit
-at `default_priority: 5`; how often a course comes up is `share`'s job, not priority's.
-
-### The course draw is independent across sessions
-
-Courses are drawn i.i.d. at those probabilities (30/30/20/20 in the example above), with no memory of what the last
-few sessions were. That is a deliberate choice against the obvious alternative. A *deficit* scheme,
-weighting each course by its target minus what the last ten sessions actually served, makes every
-window of ten land exactly on the shares; it was built, measured and then removed. It buys that
-exactness by turning the rotation into a cycle the learner could recite, and it needs a session history to
-read.
-
-Independence gives the right long-run frequency and a genuinely uncertain next session. The cost is
-streaks: over ten sessions a course with `share: 3` comes back anywhere from none to eight times,
-standard deviation about 1.5. **That cost is small here because naming a course overrides the draw
-in one sentence** — a scheduler that cannot produce an unlucky run also cannot produce a surprise,
-and the run is the cheaper of the two problems to fix.
-
-### Noise on the unit, not on the course
-
-The second stage adds a small Gaussian to each unit's urgency before weighting — `units.UNIT_NOISE`,
-default sigma `0.25` against a 0–5 range, overridable per run with `session.py --noise N`. It
-reorders units that are already close and does not promote a cold unit over a due one. Its one
-visible effect is at the bottom: a unit reviewed today has urgency exactly 0 and was therefore
-unreachable, and the noise gives it about a 1% chance instead. The quiz draw does not use it, since
-there the urgency ranking is the entire claim being made.
-
-### Why the scheduler is built this way
-
-These choices were each tried the other way first; do not reintroduce the alternatives.
-
-- **The study pick is a weighted draw, not an argmax.** Many eligible units sit at exactly the same
-  urgency (never reviewed, so `R = 0` and urgency equals priority), and an argmax with a
-  tie-break then walks the curriculum in alphabetical order and never interleaves. Top-1 is
-  top-N with N = 1, which is the failure the quiz's weighted draw already exists to avoid.
-- **Course frequency is set by `share`, not by bending priorities.** Priorities tuned to offset
-  unit counts work, but nobody reading the numbers later can tell why a large course sits at 2
-  and a small one at 10.
-- **The course draw is independent, not deficit-scheduled.** A deficit scheme hits every ten-session
-  window exactly and turns the rotation into a recitable cycle. Independence was measured to give
-  P(same course twice running) of about 0.27 for a 3-of-10 share, matching the i.i.d.
-  prediction; naming a course fixes an unlucky run.
-- **The quiz is not balanced by `share`.** Its job is to return what has been studied, and forcing
-  course balance would over-drill thin courses that have only a handful of quiz-eligible units.
-  It stays urgency-weighted and evens out as the other courses are studied.
-- **`units.recent_study_courses()` is display only.** `session.py` prints the recent course mix so
-  an unwanted run is visible, but nothing schedules on it, so session filenames are not
-  load-bearing.
-
-**A prerequisite edge is satisfied once its source unit reaches `learning`** — partial grasp, not
-completion. Requiring completion would serialize a curriculum for no reason.
+- The unit is drawn in a weighted sample, not argmax. This ensures that the curriculum is somewhat randomly shuffled so the learner is not bored by a linear alphabetical walk of the course. 
+- Course frequency is explicitly set by the learner via a per-course `share` number, typically constrained to sum to 10 for interpretability. 
+- The quiz is not balanced by `share` since its job is to optimally retain already-learned concepts.  Forcing course balance would over-drill thin courses that have only a handful of quiz-eligible units. 
+- `units.recent_study_courses()` is display only. It shows the recent course mix so the learner can spot an unlucky run and name a course instead; nothing schedules on it.
 
 ## Layout
 
-**A course is two files and a directory.** There is no `COURSE.md` and no `map.md`: everything
-in them either belonged on a unit or was prose, and the prose moved into the `units.json` header.
+A course is two files within a directory: `units.json`, `bank.jsonl`, and `sources/`.
 
 ```
 vault/
   courses/<slug>/
-    units.json       # THE course — header prose, units, concepts, structure, all state
-    bank.jsonl       # every question, generative only
-    sources/         # PDFs, papers, notes (yours; none are included)
-  courses/example/   # a one-unit example course with its own notes and five questions
-  courses/_archive/  # shelved courses, created on first use; moved, never deleted; not scheduled
-  sessions/          # one dated markdown record per session, vault-wide (starts empty)
-  BLOCKED.md         # template: units removed for having no source; re-add when the reading lands
-  README.md          # for the learner: what the vault is and how to use it
-  CLAUDE.md          # for the agent: this file; rules, layout, scheduler and data formats
-  flashcards.json    # flashcard-layer settings: last cleanup date, vocabulary sorting page URL
-  vocabulary/
-    sort.html        # the word-sorting page, published as an Artifact
-    sources/         # where to fetch the public word lists (the lists are not included)
+    units.json       # THE course: prose, units, concepts, structure, statistics
+    bank.jsonl       # Question bank
+    sources/         # PDFs, papers, notes
+  courses/_archive/  # Shelved courses, created on first use; not scheduled
+  sessions/          # One dated markdown record per session
+  BLOCKED.md         # Units temporarily blocked by having no source
+  README.md          # Instructions for the learner
+  CLAUDE.md          # Instructions for the agent
+  flashcards.json    # Flashcard-layer settings
   .claude/hooks/
     session-start.sh # runs check_vault.py and restates the artifact rule at session start
   .mcp.json          # optional MCP servers: anki (AnkiConnect) and raindrop
@@ -200,7 +115,7 @@ vault/
     knowledge-map/   # cut a unit's concepts and the edges between them
     bank-generator/  # bulk-generate questions from a course's sources
     course/          # create and maintain a course
-    flashcards/      # optional Anki cards from sessions, work papers and vocabulary; SETUP.md
+    flashcards/      # optional Anki cards from sessions and work papers; SETUP.md
     explain/         # ad hoc: teach the gaps in a paper, report or project need, then sort them
   scripts/
     session.py       # the scheduler: quiz draw + study pick
@@ -213,19 +128,9 @@ vault/
     anki_mix.py              # scatter newly added cards through Anki's new-card queue
     anki_decks.py            # put every Vault card in the subdeck its kind belongs in
     anki_prereview_apply.py  # apply an automated pre-review pass to unseen cards
-    vocab.py                 # vocabulary candidates: word lists → pool → sorting page → verdicts
 ```
 
-Inside `units.json`, the header carries `sources` (the bibliography) and `notes` (scope,
-difficulty calibration, and any caveat about the material) — the two parts of the old `COURSE.md`
-that were load-bearing, and what `bank-generator` reads. Each unit carries its own `concepts`
-array, in sweep order, each entry `{id, kind, claim, prereqs, external_prereqs?, state,
-questions}`. Concept `prereqs` **order the sweep and gate nothing**, so a wrong one costs a
-slightly odd sweep order and nothing else; that is what makes thousands of them cheap to keep.
-`external_prereqs` holds cross-course dependencies as descriptive phrases, because the far end
-may have no exactly-matching concept to point at.
-
-## Running the scripts
+## Scripts TL;DR
 
 ```
 python3 scripts/session.py                 # what to be quizzed on, and what to study
@@ -240,137 +145,92 @@ python3 scripts/check_vault.py             # must report 0 errors
 python3 scripts/check_vault.py --warnings  # list the warnings too
 ```
 
-`review.py` is the **only** thing that should write the SRS numbers. It folds one review's
-outcome into `difficulty`, `stability`, `reps`, `lapses` and `last_seen`, sets concept states,
-moves the cursor and appends the log entry, in one call.
+`review.py` writes all SRS numbers. One call folds a review's outcome into `difficulty`, `stability`, `reps`, `lapses` and `last_seen`, sets concept states, moves the cursor and appends the log entry.
 
-`check_vault.py` is the gate: run it after anything that writes structure, and it must stay at
-zero errors. It validates bank fields and ids, `source_ref` paths against the filesystem,
-`units.json` headers and every unit's reading status, priority and SRS fields, each concept's
-`kind`, `claim` text and `state`, that no concept id appears in two units, that concept
-prerequisites resolve within their course and the concept graph is acyclic, cursor targets,
-question links in both the concept and unit lists, and unit prerequisite resolution and
-acyclicity. It also enforces unit size — a warning above 25 concepts, an error above 35.
+`check_vault.py` is the integrity gate. Run it after any structural change; it must report 0 errors. It checks:
 
-Warnings are informational and do not fail the run. Most are `source_ref`-format issues from
-question generation; archived courses are exempt from the stricter bar a live course is held to.
+- bank entries: required fields, unique ids, `source_ref` paths that exist;
+- `units.json`: headers, reading status, priority and SRS fields;
+- concepts: `kind`, `claim`, `state`, ids unique across units, prerequisites that resolve inside the course, no cycles;
+- cursors and question links;
+- unit prerequisites: they resolve, no cycles;
+- unit size: a warning above 25 concepts, an error above 35.
 
-Cross-course dependencies are no longer summarised anywhere. They live as `external_prereqs`
-on individual concepts, and their far end is a descriptive phrase rather than an
-id, so nothing can resolve them into a course-level graph without hand work. The script that
-used to print one read the map files and was deleted with them; it was reference-only, so no
-session depended on it.
+Warnings do not fail the run. Most are `source_ref` formatting issues from question generation. Archived courses are held to a looser bar.
+
+Cross-course dependencies live only as `external_prereqs` phrases on individual concepts. Nothing aggregates them into a course-level graph.
 
 ## On the interface
 
-Everything runs through Claude Code with write access to this repo. That write access is the
-requirement: the banks, the units, the concepts and the learner model are all files, and git
-history is itself part of the record. A read-only setup would terminate every loop here at the point
-where it needs to record what it learned about you.
+The agent needs write access to this repository. Units, banks, concepts and the learner's progress are all files, and git history is part of the record.
 
-Each session publishes **one Artifact** — a private page with a stable URL — and **everything the
-learner reads goes on it**: the questions, their answers, the hints, the grading, every derivation
-and every diagram. This is forced rather than chosen. The Claude Code interface renders
-GitHub-flavoured markdown and nothing else, so `$\lim_{x\to a} f(x)$` reaches the learner as
-literal backslashes and a figure cannot reach them at all. A session run in the terminal does not
-merely look worse; its mathematics is unreadable and its diagrams do not exist. Chat is left with
-turn-taking — which question is live, that an answer landed, what was written back.
+Each session publishes **one Artifact**: a private page with a stable URL. **Everything the learner reads goes on it:** questions, answers, hints, grading, derivations and diagrams. Chat carries only turn-taking: which question is live, that an answer landed, what was written back.
 
-The artifact is converted to markdown into `sessions/` at capture. The narrative lives there; the
-state it produced lives in `units.json`. A session that writes one without the other is a bug.
+This is forced by the interface. Claude Code renders GitHub-flavoured markdown only, with no LaTeX and no images, so mathematics in chat arrives as raw backslashes and diagrams do not arrive at all.
+
+At capture, the artifact is converted to markdown in `sessions/`. The session narrative lives there; the state it produced lives in `units.json`. Writing one without the other is a bug.
 
 # Data model
 
 ## Levels of abstraction (locked)
 
-**This vault has exactly three levels. Do not invent a fourth.** Every file, every skill and
-every script operates at one of them, and anything that feels like it needs a new level is a unit
-or a concept described at the wrong grain.
+There are exactly three levels. Do not add a fourth: anything that seems to need one is a unit or a concept cut at the wrong size.
 
 | level | is | example | lives in |
 |---|---|---|---|
 | **Course** | a broad topic | "Database Internals" | `courses/<slug>/` |
 | **Unit** | a subtopic within a course | "Two-pass sort/hash algorithms" | a record in `units.json` |
-| **Concept** | a distinct claim *or* skill within a unit | "column stores win when… because…"; "the learner can solve telescoping sums of this shape" | an entry in a unit's `concepts` |
+| **Concept** | one claim or one skill within a unit | "column stores win when … because …"; "the learner can solve telescoping sums of this shape" | an entry in a unit's `concepts` |
 
-**The unit is the only scheduled object.** It carries its own reading, prerequisites, priority,
-spaced-repetition state, cursor, concept states, questions and history. Everything the scheduler
-needs to answer "what should I study, and what should I be quizzed on" is on the unit record.
-
-A **course is a list of units** plus the material they share — a bank and a sources directory. It is not a scheduling unit and has no state of its own. Two courses may legitimately
-reference the same unit: a databases course and an information retrieval course might both want
-Fagin's Threshold Algorithm.
-
-A **concept is a claim or a skill.** Both are things to internalize and both are testable, but
-they fail differently: a claim is either regenerable or not, while a skill is fluent, halting, or
-absent. Write skill concepts as capabilities — *"the learner can …"* — not as facts.
+- **The unit is the only scheduled object.** It carries its reading, prerequisites, priority, spaced-repetition state, cursor, concept states, questions and history.
+- **A course is a list of units** plus a shared question bank and sources directory. It has no state of its own. Two courses may reference the same unit.
+- **A concept is a claim or a skill.** A claim is either recalled or not. A skill is fluent, halting or absent. Write skills as capabilities ("the learner can …").
 
 ### Unit size
 
-A unit is **one to four hours of study to cover every concept in it once** — roughly a chapter,
-or a portion of one where the book is dense. In practice that lands at 6–20 concepts. A unit much
-past 25 concepts should be split; `check_vault.py` warns above 25 and errors above 35.
+A unit takes one to four hours to cover every concept once: roughly a chapter, or part of a dense one. That is usually 6 to 20 concepts. `check_vault.py` warns above 25 and errors above 35.
 
-This is the size that makes the rest work: small enough that "study this unit" is a session
-rather than a project, large enough that the prerequisite graph over units stays coarse enough
-to maintain by hand.
+Smaller units make the prerequisite graph too fine to maintain by hand. Larger units cannot be finished in a session, so they never reach `learned`.
 
 ### What a prerequisite edge means
 
-The same definition governs both graphs that matter — units and concepts.
+An edge `A --> B` means: without at least a partial grasp of A, B will not make sense, or the learner will have no idea where to start on it. The same definition applies to units and to concepts.
 
-An edge `A --> B` asserts: **without at least a partial grasp of A, B will not make sense, or you
-will blank on how to tackle it.**
-
-Two halves of that, and the second is the one people get wrong:
-
-- **The failure it predicts** is either incomprehension ("this sentence is words") or paralysis
-  ("I know what is being asked and have no idea where to start"). If neither would happen, there
-  is no edge — B being *easier* with A, or *usually taught after* A, is not an edge.
-- **The threshold is partial, not complete.** `A --> B` does **not** mean 100% of A must be closed
-  before B can begin.
-
-Operationally: **an edge is satisfied once its source unit reaches `learning`.** A unit that is
-`unknown` or `new` blocks what depends on it; one that has been studied even once does not.
-Requiring completion serializes a curriculum for no reason, and starting B is often what
-consolidates A.
+- **The failure it predicts** is incomprehension or paralysis. "B is easier after A" or "B is usually taught after A" is not an edge.
+- **The threshold is partial.** An edge is satisfied once its source unit reaches `learning`. A unit at `unknown` or `new` blocks its dependents; one studied even once does not.
 
 ### The two dependency graphs
 
 | edge | used for | notes |
 |---|---|---|
-| **unit → unit** | **the working graph** — eligibility, quiz sampling, study selection | Deliberately coarse. Declared in `units.json`; may cross courses as `<course>:<unit>`. |
-| **concept → concept** | **within-session order** — where the sweep goes next | Primarily a linear chain with a few branches. Declared on the concept. **Ordering hints, never gates** — a wrong one costs a slightly odd sweep order, so they do not need to be perfect, only walkable. If a concept graph is heavily non-linear, the unit is probably two units. |
+| **unit → unit** | eligibility, quiz sampling, study selection | Coarse on purpose. Declared in `units.json`. May cross courses as `<course>:<unit>`. |
+| **concept → concept** | the order of the sweep within a session | Mostly a chain with a few branches. Ordering hints only, never gates, so a wrong edge costs only an odd sweep order. A heavily branching concept graph means the unit should be split. |
 
-There is no course-level graph. Cross-course dependency is recorded where it is actually
-observed — as `external_prereqs` on the concept that has it — and nothing routes on it.
+There is no course-level graph. A cross-course dependency is recorded as `external_prereqs` on the concept that has it, and nothing routes on it.
 
 ## Course layout
 
-**A course is two files and a directory.** It has no `COURSE.md` and no `map.md`: everything
-that was in them either belonged on a unit or was prose, and the prose moved into the header.
+A course is `units.json`, `bank.jsonl` and `sources/`, and nothing else.
 
 ### courses/<slug>/units.json
 
-Pretty-printed JSON — one object with a header and a `units` array. **Readable and editable by
-hand**; that is why it is not JSONL. The example below is illustrative; `courses/example/units.json`
-is a complete, valid course.
+Pretty-printed JSON, meant to be read and edited by hand: a header plus a `units` array. The example below is illustrative; `courses/example/units.json` is a complete, valid course.
 
 ```json
 {
   "course": "ir-ranking",
   "title": "Information Retrieval & Ranking",
+  "share": 3,
   "default_priority": 5,
   "units": [
     {
-      "id": "ir-B2c",
+      "id": "ir-transformer",
       "title": "The Transformer",
       "reading": {
-        "source": "courses/ir-ranking/sources/vaswani-2017-attention.pdf",
-        "locator": "§3 Model Architecture",
+        "source": "courses/ir-ranking/sources/vaswani-2017-attention.pdf#§3 Model Architecture",
         "status": "present"
       },
-      "prereqs": ["ir-B2b", "linear-algebra:la-vectors-dot-products"],
+      "prereqs": ["ir-seq2seq-attention", "linear-algebra:la-vectors-dot-products"],
       "priority": 5,
       "placed": "2026-08-17",
       "srs": {
@@ -408,135 +268,70 @@ is a complete, valid course.
 
 #### Header
 
-- **`share`** is how often this course comes up in the study draw, as a ratio against the other
-  live courses. Set them so they sum to 10 and each reads directly as *sessions out of ten*.
-  A course with no eligible unit in a given session holds no slot, and the rest renormalise over
-  what remains. `0` keeps a course loaded but never studied. Optional for back-compat: a course
-  without it falls back to `default_priority`, which reintroduces the unit-count bias `share`
-  exists to remove, so `check_vault.py` warns.
-- **`default_priority`** applies to every unit in the course. A unit overrides it with its own
-  `priority`. Since `share` decides how often the *course* comes up, priority now says only how
-  much a unit matters against its own coursemates. `0` means **never scheduled and never sampled**
-  — the way to mute material that is real but not wanted right now.
-- **`sources`** — the bibliography, one entry per source, saying what each is for.
-- **`notes`** — free prose about the course as a whole: what the sources cover and deliberately
-  do not, where the granularity is intentionally coarse, what the bank does not reach, and any
-  caveat about the material (a PDF whose formula layer did not extract, say). Read by
-  `skills/bank-generator/SKILL.md`; not parsed by anything.
+- `share`: how often the course comes up in the study draw, relative to the other live courses. Make the shares sum to 10 so each reads as "sessions out of ten". A course with no eligible unit gives up its slot for that session. `0` keeps a course loaded but never studied. A course without `share` falls back to `default_priority`, and `check_vault.py` warns.
+- `default_priority`: the priority of every unit that does not set its own. Priority only ranks a unit against its coursemates. `0` mutes a unit: never studied, never quizzed.
+- `sources`: the bibliography, one entry per source, saying what each is for.
+- `notes`: free prose about the course: what the sources cover and leave out, where granularity is coarse on purpose, what the bank does not reach, caveats about the material. `skills/bank-generator/SKILL.md` reads it; no script parses it.
 
 #### `reading`
 
-- `status` is `present` or `missing` — can this unit be run at all. A unit whose reading is not
-  in the vault is legal and expected (a course can exist as a plan before it exists as material),
-  but the tutor must refuse to run it rather than improvising from nothing.
-- `also_read` and `missing_readings` are optional lists, for units that pair a textbook chapter
-  with a paper that is (or is not) in the vault.
+- `status` is `present` or `missing`. A course may exist as a plan before its material arrives, but the tutor refuses to teach a unit whose reading is `missing`.
+- `also_read` and `missing_readings` are optional lists, for units that pair a chapter with a paper.
 
 #### `concepts`
 
-An ordered list, and **the order is the sweep order** — topological within the unit.
+An ordered list. The order is the sweep order, topological within the unit.
 
-| field | |
+| field | meaning |
 |---|---|
-| `id` | unique across the whole course, not just the unit |
-| `kind` | `claim` or `skill`. A skill is written as a capability — *"the learner can …"* |
-| `claim` | what it asserts, in one sentence. This is what the tutor teaches and tests against. |
-| `prereqs` | concept ids **within this course**. Ordering hints for the sweep — never eligibility gates. |
-| `external_prereqs` | optional; what this leans on in another course, as a descriptive phrase. The far end is a phrase and not an id because the other course may not have a concept that matches exactly. |
-| `state` | `unknown` / `unseen` / `seen` |
-| `questions` | bank ids testing this concept |
+| `id` | unique across the whole course |
+| `kind` | `claim` or `skill`; a skill is written "the learner can …" |
+| `claim` | what it asserts, in one sentence; the tutor teaches and tests against this |
+| `prereqs` | concept ids within this course; ordering hints, never gates |
+| `external_prereqs` | optional; what it leans on in another course, as a descriptive phrase (the other course may have no exactly matching concept) |
+| `state` | `unknown` (not placed), `unseen` (placed, not yet studied) or `seen` (studied at least once) |
+| `questions` | ids of the bank questions that test it |
 
-| concept state | meaning |
-|---|---|
-| `unknown` | not placed — no information either way |
-| `unseen` | placed, and determined not to have been studied |
-| `seen` | studied at least once |
+A question is askable only when every concept it is attached to is `seen`. A question that no concept claims sits in the unit's own `questions` list and is askable once the unit reaches `learning`. The two lists never overlap: `units.unit_questions()` joins them and `units.askable()` filters them.
 
-A question is **askable** only when every concept it is attached to is `seen` — a question
-testing two claims cannot be a fair review while half of what it tests was never studied. A
-question the unit owns but no concept claims sits in the unit's own `questions` list and is
-askable once the unit reaches `learning`, there being no finer evidence to gate it on. The two
-lists are disjoint: `units.unit_questions()` unions them, `units.askable()` filters them.
+#### `stage`: derived, never stored
 
-#### `stage` — derived, never stored
-
-A unit's stage is a function of `placed`, `srs.reps` and its concept states, evaluated in this
-order:
+`scripts/units.py` computes a unit's stage from `placed`, `srs.reps` and its concept states, checking in this order:
 
 | stage | condition |
 |---|---|
-| `unknown` | `placed` is null — never placed |
+| `unknown` | `placed` is null |
 | `learned` | every concept is `seen` |
-| `learning` | `srs.reps >= 1` — studied in at least one session |
-| `new` | otherwise — placed, but studied zero times |
+| `learning` | `srs.reps >= 1` |
+| `new` | otherwise: placed, never studied |
 
-Storing it would let it drift from the concept states that define it. `scripts/units.py` computes
-it; everything else asks that.
+- **Demotion:** repeated quiz failure sets the failing concepts back to `unseen`, which drops a `learned` unit to `learning`. That is the whole repair mechanism.
+- **No cascade:** `srs.reps` never decreases, so demotion stops at `learning`. Since prerequisite edges are satisfied at `learning`, a failure never blocks units downstream.
 
-**Demotion is real.** Repeated quiz failure on a `learned` unit sets the failing concepts back to
-`unseen`, which drops the unit to `learning` on the next evaluation. That is the whole of the
-repair mechanism — there is no separate repair course and no spur.
+#### `srs`: ranked, never due-dated
 
-**A demotion cannot cascade.** `srs.reps` only ever increases, so a unit that has reached
-`learning` can never fall back to `new` or `unknown`; demotion moves `learned → learning` and no
-further. Since a prerequisite edge is satisfied at `learning`, **nothing downstream is ever
-blocked by a failure upstream.** One hard concept failing a review returns its own unit to the
-study pool and changes the eligibility of nothing else — which is the behaviour you want, because
-the alternative is that a single bad evening withdraws a third of the curriculum.
+The memory model is FSRS's, without its scheduler. `difficulty` and `stability` update on each review, and no due date is ever computed, so a long gap creates no backlog. Urgency is computed as in "Scheduler" above.
 
-#### `srs` — retrievability-ranked, never due-dated
+`units.review(unit, grade)` takes `fail`, `partial` or `pass`. A unit's review spans several questions, so three grades replace FSRS's four buttons. Its update rule has four deliberate properties:
 
-FSRS's memory model, without its scheduler. `difficulty` and `stability` update per review;
-what is *never* computed is a due date, because due dates create backlogs and this vault must
-work identically at one hour a week or fifteen.
+1. **A lapse multiplies stability by 0.4 and never resets it.** A unit learned and forgotten is not the same as one never learned.
+2. **Growth is damped by how retrievable the unit already was** (a `(1 − R)` factor). An effortless review teaches the schedule little; an effortful one teaches it a lot.
+3. **Difficulty drifts and never jumps.** One bad session is noise.
+4. **`lapses` counts every review the learner could not produce cold**, `fail` and `partial` alike, including a unit's first review.
 
-```
-    t = days since srs.last_seen
-    R = (1 + t / (9 · stability)) ^ -1        retrievability
-    urgency = (1 − R) · priority
-```
-
-Ranking by urgency instead of thresholding it means a three-week gap produces no debt — only a
-set of units that are all somewhat more urgent than they were, in the same order.
-
-**The update rule is `units.review(unit, grade)`** — `fail` | `partial` | `pass`, three grades
-rather than FSRS's four because a unit's review is several questions and the aggregate is not a
-button press. Three properties of it are deliberate:
-
-- **A lapse multiplies stability (×0.4); it never resets it.** A unit learned once and lost is
-  not in the same state as one never learned, and treating them alike is what makes conventional
-  schedulers punishing after a gap.
-- **Growth is damped by how retrievable the unit already was** — the gain carries a `(1 − R)`
-  term. Reviewing something you would have recalled anyway teaches the schedule little; a review
-  that was genuinely effortful teaches it a lot. This is the desirable-difficulty effect, priced
-  in.
-- **Difficulty drifts, it never jumps.** One bad session on a unit you know is noise.
-
-**`lapses` counts every review the learner could not produce cold**: `fail` and `partial` alike,
-and a unit's first review too. It is a fact about the review, counted independently of the
-stability update. First reviews matter most here, because a unit can be placed high without ever
-having been studied, and its first real review is the one worth recording.
-
-Record reviews with `scripts/review.py`, never by hand-editing the numbers.
+Record reviews with `scripts/review.py`; never hand-edit the numbers.
 
 #### `cursor`
 
-**The load-bearing field.** `concept` is where the sweep reached; `note` is a human-readable
-position. With it a session resumes mid-unit; without it the sweep starts at the unit's first
-concept and moves fast until it hits friction.
-
-Advance it **as the sweep moves**, not only at the end of a block. That is what makes stopping at
-any moment safe.
+`concept` is where the sweep reached; `note` describes the position for a person. With it a session resumes mid-unit; without it the sweep starts at the first concept. Advance it as the sweep moves, not at the end, so the learner can stop at any moment.
 
 #### `log`
 
-Append-only. One entry per session that touched the unit: `date`, `what` (a sentence a person
-could act on), and `failed` (concept ids that missed). This is where a demotion records *why*.
+Append-only, one entry per session that touched the unit: `date`, `what` (a sentence a person could act on) and `failed` (concept ids that missed). A demotion records its reason here.
 
 ### courses/<slug>/bank.jsonl
 
-One JSON object per line. Append-only — never rewrite existing entries in place (except to fix a
-factual error), since sessions reference questions by `id`.
+One JSON object per question per line. Append-only: sessions refer to questions by `id`, so only rewrite an entry to fix a factual error.
 
 ```json
 {
@@ -554,66 +349,34 @@ factual error), since sessions reference questions by `id`.
 }
 ```
 
-**Every question is generative.** No multiple choice anywhere in this vault — recognition is
-handled by the learner's own immersive reading, and every question the system asks requires a
-production.
-
-**Factual recall is a question type, not a separate object.** There are no cards. A theorem
-statement, a definition or a piece of vocabulary that must be memorized becomes a bank question
-that asks for it — *"Define X"*, *"What does Y mean inside the definition of Z?"*, *"Contrast the
-definition of A with that of B"*. The spacing that flashcards provide comes from the unit-level
-SRS above, not from the question being a different kind of thing.
-
-- `topic` is the legacy name for the course and matches the id prefix; `course` is the slug of
-  the directory the question lives in. Both are required — `check_vault.py` rejects an entry
-  missing either.
-- `type` is a loose tag, not a fixed enum — see `skills/bank-generator/SKILL.md`.
-- `answer_key` should let a grader check correctness without going back to the source.
-- `grading_notes` is optional — for multiple acceptable framings or common near-misses.
+- **Every question is generative.** No multiple choice.
+- **Factual recall is a question type.** A definition or theorem statement to memorize becomes a question that asks for it ("Define X", "What does Y mean in the definition of Z?", "Contrast the definitions of A and B"). Its spacing comes from the unit's SRS. Anki flashcards are a separate, optional, lighter layer (`skills/flashcards/SKILL.md`).
+- `topic` is the legacy course name that matches the id prefix; `course` is the directory slug. `check_vault.py` requires both.
+- `type` is a loose tag, not a fixed list (see `skills/bank-generator/SKILL.md`).
+- `answer_key` must let a grader check an answer without the source.
+- `grading_notes` is optional: other acceptable framings, common near-misses.
 
 ### sessions/
 
-One file per session, `sessions/<YYYY-MM-DD-HHMM>-<unit-id>.md`, converted from that session's
-artifact. Holds the questions asked, the answers given, and annotations on what was difficult.
+One markdown file per session, converted from its artifact: the questions asked, the answers given verbatim, and notes on what was hard.
 
-`units.recent_study_courses()` reads these filenames to show the recent course mix at the top of a
-session, resolving the `<unit-id>` part by its course prefix. **Nothing schedules on it** — the
-course draw is independent of history — so an off-convention name costs a line of context and not
-a scheduling decision. A quiz-only session has no unit and is named `mixed-retention`.
-
-The narrative lives here; the state it produced lives in `units.json`. A session that writes one
-without the other is a bug.
-
-An **explain session** (`skills/explain/SKILL.md`) studies no unit and is named
-`<YYYY-MM-DD-HHMM>-explain-<slug>.md`. Its file opens with front matter (`kind`, `title`,
-`source_kind`, `source`, `topics`, `status`, and `cursor` while `status` is `open`), which
-`scripts/explain.py` reads to resume open sessions and count how often each topic recurs, and
-which `check_vault.py` validates. Its `explain-` prefix matches no course, so it does not count
-toward the recent course mix. Any `units.json` writes it makes are concepts added to existing
-units, each with a `log` entry.
-
----
+- **Study and quiz sessions** are named `<YYYY-MM-DD-HHMM>-<unit-id>.md`; a quiz-only session uses `mixed-retention` in place of the unit id. `units.recent_study_courses()` reads the names to display the recent course mix. Nothing schedules on them.
+- **Explain sessions** are named `<YYYY-MM-DD-HHMM>-explain-<slug>.md` and open with front matter: `kind`, `title`, `source_kind`, `source`, `topics`, `status`, and `cursor` while `status` is `open`. `scripts/explain.py` reads it to resume open sessions and to count how often each topic recurs; `check_vault.py` validates it.
 
 ## Retired
 
-Each of these was a real mechanism that is now gone. Do not reintroduce them.
+Each of these were previously tried and rejected. Do not reintroduce them. 
 
-| retired | replaced by |
-|---|---|
-| `cards.jsonl` | factual-recall **questions** in `bank.jsonl`; spacing comes from unit SRS |
-| `spurs.jsonl` | nothing — a discovered gap demotes concepts in the unit that owns them |
-| `courses/repair/` | the same demotion; a repaired unit is just a unit |
-| `STUDY.md` stride scheduling | per-unit `priority` × retrievability |
-| `targets:` and derived disposition | `priority: 0` on units you do not want |
-| `plan.md` | `units.json` is the plan |
-| `tests/`, `session_log.jsonl` | `sessions/` |
-| `units.jsonl` `track` field | nothing — it was a label, never a level |
-| `LEARNER.md` | the owning unit's `log`, where an observation sits next to its evidence |
-| `MIGRATION.md` | git history |
-| `map.md` | concepts fold into the unit that owns them |
-| `COURSE.md` | `sources` and `notes` in the `units.json` header; everything else was per-unit |
-| track-letter unit ids (`ir-A1`, `ir-C2a`) | descriptive ids |
-| `units.jsonl` `mode`, `depth`, `est_hours`, `goal`, `learn` | one workflow, so nothing branches on mode; size is fixed by the unit-size rule |
-| unit `status`, `placement` | derived `stage` |
-| "areas" (a fourth level between course and unit) | units |
-| the 5-rung concept ladder (`gap`/`shaky`/`derivable`/`solid`) | `unseen`/`seen`, with SRS carrying the graded part |
+| retired                                                       | replaced by                                                             |
+|---------------------------------------------------------------|-------------------------------------------------------------------------|
+| `cards.jsonl`                                                 | `bank.jsonl`; spacing comes from unit SRS                               |
+| `STUDY.md` stride scheduling                                  | per-unit `priority` × retrievability                                    |
+| study targets                                                 | set `priority: 0` for unwanted units                                    |
+| curriculum plan document                                      | `units.json` _is_ the plan                                              |
+| learner profile                                               | the owning unit's `log`, where an observation sits next to its evidence |
+| migration log                                                 | git history                                                             |
+| map of concepts                                               | concepts fold into the unit that owns them                              |
+| course document                                               | `units.json` _is_ the course                                            |
+| alphanumeric unit IDs (`ir-A1`, `ir-C2a`)                     | descriptive ids                                                         |
+| estimated hours, additional layers of abstraction             | one mode; size is fixed by the unit-size rule                           |
+| unit `status`, `placement`                                    | derived `stage`                                                         |
