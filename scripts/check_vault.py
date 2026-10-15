@@ -2,21 +2,13 @@
 """
 Vault integrity checker.
 
-Run before and after every migration phase. The point is that a phase which breaks a
-cross-reference gets caught immediately, not three phases later when it's hard to attribute.
-
-Layout-agnostic on purpose: it discovers banks and maps under both the legacy layout
-(question_banks/, maps/) and the course layout (courses/<slug>/), so it keeps working
-throughout the migration rather than needing to be rewritten mid-flight.
-
-Source-ref strictness escalates automatically as the migration proceeds: non-canonical
-source_ref values are warnings for an unmigrated topic, but errors for any course that has
-units.json or declares `refs: canonical` in COURSE.md. --strict-refs applies that bar
-everywhere and is the Phase 6 exit gate. Archived courses stay exempt.
+Run it after any structural change and before any merge. It must report 0 errors.
 
 ERROR = a broken cross-reference or malformed record. Fails the run (exit 1).
-WARN  = a data-quality problem that doesn't break anything today but will make the course
-        migration harder. Reported, does not fail.
+WARN  = a data-quality problem that breaks nothing today. Reported, does not fail.
+
+source_ref values that are not real vault paths are errors in any course with a units.json,
+and warnings elsewhere. --strict-refs makes them errors everywhere. Archived courses are exempt.
 
 Usage:
     python scripts/check_vault.py [--vault .] [--warnings] [--quiet]
@@ -66,11 +58,9 @@ def load_jsonl(path, rep):
 def course_dirs(vault):
     """Every course directory, live or archived, with its archived flag.
 
-    Location is authoritative: anything under courses/_archive/ is archived regardless of what
-    its COURSE.md says. Archived courses stay fully discoverable -- their banks are still
-    referenced by session_log.jsonl and by past test documents, so dropping them from discovery
-    would break those joins. They are excluded from scheduling and from source_ref strictness,
-    not from existence.
+    Anything under courses/_archive/ is archived. Archived courses are still checked, because
+    session records refer to their questions; they are only excluded from scheduling and from
+    source_ref strictness.
     """
     out = []
     for d in sorted((vault / "courses").glob("*/")):
@@ -83,12 +73,11 @@ def course_dirs(vault):
 
 
 def course_meta(vault, name):
-    """Read a course's COURSE.md for the fields that change how strictly we check it.
+    """The fields that decide how strictly a course is checked.
 
-    `refs: canonical` is a latch: once a course declares its source_refs normalized, any
-    regression becomes an error rather than a warning. A course with units.json is held to
-    the same bar whether or not it declares it -- unit mapping joins on real paths, so prose
-    citations there are a broken join waiting to happen, not a style preference.
+    A course with a units.json is held to real-path source_refs, because units join questions
+    on those paths. An optional COURSE.md with `refs: canonical` applies the same bar to a
+    course without one.
     """
     meta = {"tier": None, "refs": "legacy", "planned": False}
     d = vault / "courses" / name
@@ -111,7 +100,7 @@ def course_meta(vault, name):
 
 
 def find_banks(vault):
-    """Course banks (live and archived), plus any legacy question_banks/<topic>.jsonl."""
+    """Course banks, live and archived (and any question_banks/<topic>.jsonl, if present)."""
     banks = {}
     for p in sorted((vault / "question_banks").glob("*.jsonl")):
         banks[p.stem] = p
@@ -367,7 +356,7 @@ def main():
     ap.add_argument("--quiet", action="store_true", help="Summary only")
     ap.add_argument("--strict-refs", action="store_true",
                     help="Treat every non-canonical source_ref as an error, everywhere. "
-                         "This is the Phase 6 exit gate.")
+                         "Use it to audit a whole vault.")
     args = ap.parse_args()
 
     vault = Path(args.vault)

@@ -352,7 +352,7 @@ def recent_study_courses(window=SHARE_WINDOW, include_archived=False):
 
 def course_share(slug):
     """This course's target frequency. Falls back to `default_priority` for a course that has
-    not been given a `share` yet, so an unmigrated or archived course still schedules."""
+    no `share`, so such a course still schedules."""
     doc = load_course(slug) or {}
     v = doc.get("share")
     return v if isinstance(v, int) and v >= 0 else (doc.get("default_priority") or 0)

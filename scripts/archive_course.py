@@ -10,10 +10,9 @@ check_vault.py's course_dirs(): location under courses/_archive/ is what makes a
 nothing in the data itself. Priority becomes moot the moment a course is archived --
 scripts/units.py only loads live courses, so nothing needs to change there.
 
-A course in the current architecture is units.json + bank.jsonl + sources/, no COURSE.md and no
-map.md -- the whole directory moves as one atomic git operation, and every source_ref inside
-bank.jsonl naming a real vault path under the old location is rewritten to the new one in the
-same step, so nothing is left pointing at a path that no longer exists.
+A course is units.json + bank.jsonl + sources/. The whole directory moves as one git operation,
+and every source_ref in bank.jsonl that names a path under the old location is rewritten to the
+new one in the same step.
 
 Usage:
     python3 scripts/archive_course.py archive <slug>

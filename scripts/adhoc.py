@@ -19,7 +19,7 @@ Front matter is a small fixed format, parsed here rather than with a YAML librar
     kind: adhoc
     title: Product quantization in the FAISS report
     source_kind: report            # paper | report | project | other
-    source: https://raindrop.io/... (or a vault path, or a one-line project description)
+    source: courses/adhoc/sources/<file> (or another vault path, a URL, or a one-line project description)
     topics: [product-quantization, inverted-file-index]
     status: open                   # open | done
     cursor: inverted-file-index — PQ codes done; IVF probing next

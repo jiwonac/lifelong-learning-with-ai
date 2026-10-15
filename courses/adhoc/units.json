@@ -1,0 +1,11 @@
+{
+  "course": "adhoc",
+  "title": "Ad hoc topics",
+  "share": 0,
+  "default_priority": 5,
+  "sources": [
+    "courses/adhoc/sources/: the ad-hoc learn queue. Drop papers, articles, reports and notes here to study later in an ad-hoc session."
+  ],
+  "notes": "Holds units promoted from ad-hoc sessions (topics taught in more than one ad-hoc session with no other course to hold them; see skills/ad-hoc/SKILL.md, Promotion). Unit ids start with adhoc-. share 0: never drawn for study, but its units' questions are quizzed like any other unit's.",
+  "units": []
+}
