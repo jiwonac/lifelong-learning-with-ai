@@ -350,14 +350,14 @@ def check_units(vault, questions, rep):
 
 
 
-def check_explain(vault, rep):
-    """Explain-session records carry front matter that `scripts/explain.py` reads to list open
+def check_adhoc(vault, rep):
+    """Ad-hoc session records carry front matter that `scripts/adhoc.py` reads to list open
     sessions and count topics. A malformed one drops out of both, so it is an error."""
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-    import explain
-    for path, meta in explain.records(vault / "sessions"):
-        for msg in explain.problems(path, meta):
-            rep.error("explain-session", f"sessions/{path.name}: {msg}")
+    import adhoc
+    for path, meta in adhoc.records(vault / "sessions"):
+        for msg in adhoc.problems(path, meta):
+            rep.error("adhoc-session", f"sessions/{path.name}: {msg}")
 
 
 def main():
@@ -379,7 +379,7 @@ def main():
         return 1
     questions = check_banks(vault, banks, rep, strict_refs=args.strict_refs)
     units = check_units(vault, questions, rep)
-    check_explain(vault, rep)
+    check_adhoc(vault, rep)
 
     print(f"vault: {vault.resolve()}")
     cds = course_dirs(vault)

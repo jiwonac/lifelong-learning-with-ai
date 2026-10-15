@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 """
-Read the front matter of explain-session records, `sessions/<YYYY-MM-DD-HHMM>-explain-<slug>.md`.
+Read the front matter of ad-hoc session records, `sessions/<YYYY-MM-DD-HHMM>-adhoc-<slug>.md`.
 
-An explain session teaches the gaps in one document or task the learner brought (a paper, an
+An ad-hoc session teaches the gaps in one document or task the learner brought (a paper, an
 autoresearch report, a project question) and schedules nothing. Two questions about those records
 need an answer across all of them, and this script gives it:
 
-    python3 scripts/explain.py open      # sessions stopped part-way, with their cursor
-    python3 scripts/explain.py topics    # every topic, how many sessions taught it, and where
+    python3 scripts/adhoc.py open      # sessions stopped part-way, with their cursor
+    python3 scripts/adhoc.py topics    # every topic, how many sessions taught it, and where
 
 A topic taught in two or more sessions is a candidate for a home in `units.json`: a concept on an
 existing unit, or a new unit. The script only counts. Whether the topic deserves a unit is the
-agent's call, made with the learner (see skills/explain/SKILL.md -> "Promotion").
+agent's call, made with the learner (see skills/ad-hoc/SKILL.md -> "Promotion").
 
 Front matter is a small fixed format, parsed here rather than with a YAML library:
 
     ---
-    kind: explain
+    kind: adhoc
     title: Product quantization in the FAISS report
     source_kind: report            # paper | report | project | other
     source: https://raindrop.io/... (or a vault path, or a one-line project description)
@@ -34,7 +34,7 @@ from pathlib import Path
 VAULT = Path(__file__).resolve().parent.parent
 SESSIONS = VAULT / "sessions"
 
-NAME = re.compile(r"^\d{4}-\d{2}-\d{2}-\d{4}-explain-[a-z0-9-]+\.md$")
+NAME = re.compile(r"^\d{4}-\d{2}-\d{2}-\d{4}-adhoc-[a-z0-9-]+\.md$")
 TOPIC = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 REQUIRED = ("kind", "title", "source_kind", "source", "topics", "status")
 SOURCE_KINDS = ("paper", "report", "project", "other")
@@ -64,20 +64,20 @@ def front_matter(path):
 
 
 def records(sessions=SESSIONS):
-    """(path, meta) for every explain-session file, meta None when the front matter is absent."""
-    return [(p, front_matter(p)) for p in sorted(sessions.glob("*-explain-*.md"))]
+    """(path, meta) for every ad-hoc session file, meta None when the front matter is absent."""
+    return [(p, front_matter(p)) for p in sorted(sessions.glob("*-adhoc-*.md"))]
 
 
 def problems(path, meta):
     """What is wrong with one record, as a list of messages. check_vault.py reports these."""
     out = []
     if not NAME.match(path.name):
-        out.append("filename must be <YYYY-MM-DD-HHMM>-explain-<slug>.md")
+        out.append("filename must be <YYYY-MM-DD-HHMM>-adhoc-<slug>.md")
     if meta is None:
         return out + ["no front matter"]
     out += [f"front matter missing '{k}'" for k in REQUIRED if k not in meta]
-    if meta.get("kind", "explain") != "explain":
-        out.append("kind must be 'explain'")
+    if meta.get("kind", "adhoc") != "adhoc":
+        out.append("kind must be 'adhoc'")
     if meta.get("source_kind", "other") not in SOURCE_KINDS:
         out.append(f"source_kind must be one of {', '.join(SOURCE_KINDS)}")
     if meta.get("status", "done") not in STATUSES:
@@ -91,7 +91,7 @@ def problems(path, meta):
 def cmd_open(recs):
     rows = [(p, m) for p, m in recs if m and m.get("status") == "open"]
     if not rows:
-        print("No open explain sessions.")
+        print("No open ad-hoc sessions.")
     for p, m in rows:
         print(f"{p.name}\n  {m.get('title', '?')}\n  cursor: {m.get('cursor', '?')}")
 

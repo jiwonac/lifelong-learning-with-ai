@@ -17,7 +17,7 @@ The system's design follows two guiding principles:
 | the learner says                                                   | read |
 |--------------------------------------------------------------------|---|
 | "let's do a session", "I've got an hour", "what's next"            | `skills/session/SKILL.md` (it calls `place`, `grader` and `tutor`) |
-| "explain this", "help me read <paper>", "what's in my learn queue" | `skills/explain/SKILL.md` |
+| "explain this", "help me read <paper>", "what's in my learn queue" | `skills/ad-hoc/SKILL.md` |
 | a new course, a reading list, new sources, re-cut units            | `skills/course/SKILL.md`, then `skills/knowledge-map/SKILL.md` and `skills/bank-generator/SKILL.md` |
 | anything about Anki flashcards                                     | `skills/flashcards/SKILL.md` (setup: `SETUP.md` beside it) |
 | "gtg", "I've got to go", "end session"                             | `skills/session/SKILL.md` → "gtg", at once, mid-question if need be |
@@ -34,7 +34,7 @@ The system's design follows two guiding principles:
 
 ## How a session runs
 
-### Curriculum mode
+### Curriculum session
 
 When the learner starts a learning session, `skills/session/SKILL.md` takes over.
 Every session is about **one unit**. 
@@ -54,10 +54,10 @@ If that unit is blocked by a hard prerequisite, the prerequisite becomes the uni
 A concept that fails cold twice goes back to `unseen`,
 which drops its unit out of `learned` and returns it to the study pool on its own.
 
-### Ad-hoc mode
+### Ad-hoc session
 
 The learner may present you with an ad-hoc paper, article, report, project needs, or any other one-off learning goal that is not part of the existing curriculum. 
-In this scenario, use `skills/explain/SKILL.md` instead: it maps the concepts of the material, skips the ones that the vault shows the learner already has, and teaches the rest. 
+In this scenario, use `skills/ad-hoc/SKILL.md` instead: it maps the concepts of the material, skips the ones that the vault shows the learner already has, and teaches the rest. 
 At the end, it sorts each concept taught into what already exists: nowhere, new flashcards, new concept in an existing unit, or if the topic has come up repeatedly, a new unit. 
 
 ### Scheduler
@@ -116,12 +116,12 @@ vault/
     bank-generator/  # bulk-generate questions from a course's sources
     course/          # create and maintain a course
     flashcards/      # optional Anki cards from sessions and work papers; SETUP.md
-    explain/         # ad hoc: teach the gaps in a paper, report or project need, then sort them
+    ad-hoc/          # ad-hoc session: teach the gaps in a paper, report or project need, then sort them
   scripts/
     session.py       # the scheduler: quiz draw + study pick
     units.py         # shared access to units.json; stage, urgency, eligibility, review
     review.py        # record one review's outcome — the only writer of the SRS numbers
-    explain.py       # open explain sessions, and how often each ad hoc topic has recurred
+    adhoc.py         # open ad-hoc sessions, and how often each ad-hoc topic has recurred
     check_vault.py   # integrity gate — run after any structural change
     bank_stats.py    # per-course counts, and where the bank or concept coverage is thin
     archive_course.py        # move a course into courses/_archive/ and back
@@ -360,8 +360,8 @@ One JSON object per question per line. Append-only: sessions refer to questions 
 
 One markdown file per session, converted from its artifact: the questions asked, the answers given verbatim, and notes on what was hard.
 
-- **Study and quiz sessions** are named `<YYYY-MM-DD-HHMM>-<unit-id>.md`; a quiz-only session uses `mixed-retention` in place of the unit id. `units.recent_study_courses()` reads the names to display the recent course mix. Nothing schedules on them.
-- **Explain sessions** are named `<YYYY-MM-DD-HHMM>-explain-<slug>.md` and open with front matter: `kind`, `title`, `source_kind`, `source`, `topics`, `status`, and `cursor` while `status` is `open`. `scripts/explain.py` reads it to resume open sessions and to count how often each topic recurs; `check_vault.py` validates it.
+- **Curriculum sessions** are named `<YYYY-MM-DD-HHMM>-<unit-id>.md`; a curriculum session that only quizzes uses `mixed-retention` in place of the unit id. `units.recent_study_courses()` reads the names to display the recent course mix. Nothing schedules on them.
+- **Ad-hoc sessions** are named `<YYYY-MM-DD-HHMM>-adhoc-<slug>.md` and open with front matter: `kind`, `title`, `source_kind`, `source`, `topics`, `status`, and `cursor` while `status` is `open`. `scripts/adhoc.py` reads it to resume open sessions and to count how often each topic recurs; `check_vault.py` validates it.
 
 ## Retired
 

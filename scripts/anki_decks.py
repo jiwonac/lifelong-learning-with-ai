@@ -4,7 +4,7 @@
     Vault::Courses::<course title>   cards from course sessions, and plain-fact definitions
                                      carded from a paper that a course concept covers
     Vault::Papers                    every claim attributed to a work paper
-    Vault::Ad hoc                    explain-session cards with no unit (topic and report tags)
+    Vault::Ad hoc                    ad-hoc session cards with no unit (topic and report tags)
 
 Subdecks exist so each kind of card can get its own deck options (new cards per day, desired
 retention). The tags stay as they are: they route leeches and drive cleanup, and the deck only

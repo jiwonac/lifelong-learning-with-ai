@@ -162,7 +162,7 @@ def main():
         if history:
             mix = ", ".join(f"{c.split('-')[0][:4]} {history.count(c)}"
                             for c in sorted(set(history)))
-            print(f"  last {len(history)} study session(s) actually were: {mix}")
+            print(f"  last {len(history)} curriculum session(s) actually were: {mix}")
     if study is None:
         print("  Nothing eligible. Every unit is muted, blocked on a prerequisite, learned,")
         print("  or missing its reading.")

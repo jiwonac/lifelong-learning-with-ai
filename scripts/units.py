@@ -327,14 +327,14 @@ def course_prefixes(include_archived=False):
 
 
 def recent_study_courses(window=SHARE_WINDOW, include_archived=False):
-    """The course of each of the last `window` study sessions, oldest last.
+    """The course of each of the last `window` curriculum sessions, oldest last.
 
     Read off the `sessions/` filenames, which CLAUDE.md fixes as
     `<YYYY-MM-DD[-HHMM]>-<unit-id>.md`. **Nothing schedules on this.** The course draw is
     independent of history by design; this exists so `session.py` can show what the recent mix
     actually was, which is what the learner needs in order to decide whether to override the draw.
-    A file whose remainder does not begin with a known course prefix is skipped -- a quiz-only
-    record is named `mixed-retention` and correctly does not count as studying anything.
+    A file whose remainder does not begin with a known course prefix is skipped -- a quiz-only curriculum
+    session record is named `mixed-retention` and correctly does not count as studying anything.
     """
     if not SESSIONS.is_dir():
         return []

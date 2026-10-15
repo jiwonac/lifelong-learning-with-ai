@@ -1,14 +1,15 @@
-# Session
+# Curriculum session
 
-The default entry point. Use whenever the user sits down to study — "let's do a session," "I've
-got an hour," "what's next," "I just listened to X" — and whenever they hand back work.
+The vault has two kinds of session: the curriculum session in this file, and the ad-hoc session
+(`skills/ad-hoc/SKILL.md`). This is the default entry point. Use it whenever the user sits down
+to study ("let's do a session", "I've got an hour", "what's next", "I just listened to X") and
+whenever they hand back work.
 
-A paper the user read for work and wants carded ("card this paper", "which papers should I
-card") is not a study session. Run `skills/flashcards/SKILL.md` → "Work papers" instead.
-
-Neither is an ad hoc need to understand one thing the user brought: a paper they are about to
-read or just read, an autoresearch or litreview report, a project task ("explain this", "I don't
-follow this report", "what's in my learn queue"). Run `skills/explain/SKILL.md` instead.
+Run an ad-hoc session instead when the user brings one thing to understand: a paper they are
+about to read or just read, an autoresearch or literature-review report, or a project task
+("explain this", "I don't follow this report", "what's in my learn queue"). A work paper the user
+wants carded ("card this paper", "which papers should I card") is an ad-hoc session that only
+cards it, run from `skills/flashcards/SKILL.md` → "Work papers".
 
 Everything else in this vault is a component. This file decides which components run and in what
 order.

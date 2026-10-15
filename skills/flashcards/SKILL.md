@@ -24,7 +24,7 @@ per session.
   |---|---|
   | `Vault::Courses::<course title>` | cards from course sessions, named by the course `title` in `units.json` |
   | `Vault::Papers` | every claim attributed to a work paper |
-  | `Vault::Ad hoc` | explain-session cards with no unit (`skills/explain/SKILL.md`), created with its first card |
+  | `Vault::Ad hoc` | ad-hoc session cards with no unit (`skills/ad-hoc/SKILL.md`), created with its first card |
 
   For a card that fits two, judge which kind it is. A paper's claim (its front names the paper
   in a `ttl` span) goes to Papers even with a course tag on it. A plain-fact definition carded
@@ -201,9 +201,9 @@ or move it to the bank.
 - **What does not:** anything the learner would have to derive at length; anything already
   covered by an existing card (search first); unit material the learner has not been taught yet.
 
-**Tags**, both required (paper cards add a paper tag, see "Work papers"; explain sessions use
+**Tags**, both required (paper cards add a paper tag, see "Work papers"; ad-hoc sessions use
 `vault::topic::` and `vault::report::` tags for cards with no unit, see
-`skills/explain/SKILL.md` → "Sort what was taught"):
+`skills/ad-hoc/SKILL.md` → "Sort what was taught"):
 - `vault::<course>::<unit-id>` — the unit the card came from.
 - `vault::concept::<concept-id>` — the concept in `units.json` it serves. This is how a struggling
   card finds its way back into the vault.
@@ -289,7 +289,7 @@ contribution or a deliberate argued choice, leave it out.
 critique it drew. Base them on the paper's own text or on widely known facts, never on guesses.
 
 **Trigger:** "card this paper", "I read <title>", "which papers should I card", or anything like
-it. This is its own short session. There is no quiz and no study unit, and nothing in
+it. It runs as an ad-hoc session that only cards the paper: there is no quiz and no study unit, and nothing in
 `units.json` changes.
 
 1. **Pick the papers.** If the learner named a paper, search Raindrop for it and ask for its
@@ -349,10 +349,10 @@ A card the learner keeps missing needs teaching, not more repetitions. Anki's le
 - A paper card with no concept tag (`vault::paper::` only) has no quiz to go to. Re-teach it in
   the artifact instead: reread the passage in Raindrop, explain the idea in a few sentences, and
   ask the card's front generatively. Then rewrite or split the card, and unsuspend it.
-- A `vault::topic::` or `vault::report::` card with no concept tag came from an explain session.
-  Re-teach it the same way from the explain record in `sessions/` and the source it names, then
+- A `vault::topic::` or `vault::report::` card with no concept tag came from an ad-hoc session.
+  Re-teach it the same way from the ad-hoc session record in `sessions/` and the source it names, then
   rewrite or split the card and unsuspend it. A topic card that keeps coming back as a leech is
-  a sign the topic needs a unit (`skills/explain/SKILL.md` → "Promotion").
+  a sign the topic needs a unit (`skills/ad-hoc/SKILL.md` → "Promotion").
 - Any other leech with no concept tag is a card that cannot be routed: put it in the next cleanup
   batch.
 

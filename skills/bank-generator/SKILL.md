@@ -3,7 +3,7 @@
 Use this skill when the user asks to (re)generate or expand a question bank for a topic —
 e.g. "generate a question bank for [topic]", "add more questions on [subtopic]", "bulk up
 the bank for [topic]." This is a deliberate, occasional, manually-invoked action — never run
-it automatically inside a study session. (`tutor` does add the odd question mid-session for
+it automatically inside a curriculum session. (`tutor` does add the odd question mid-session for
 something that came up uncovered; that is a handful of entries, not a generation run.)
 
 ## Inputs

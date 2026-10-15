@@ -1,4 +1,4 @@
-# Learning Vault
+# AI Driven Learning Vault
 
 This custom learning system equips AI agents with learning science principles and a structured personal learning curriculum.
 I use it to learn new topics for my PhD and personal projects, and I've refined the prompts through extensive use.
@@ -90,7 +90,7 @@ A typical learning session will take these steps:
 
 1. Ask the AI to teach you the one-off learning material.
 2. **Situate.** The AI checks if the learning material already exists in your existing courses, and if you’ve already learned any of the concepts.
-3. **Study.** You will study the material like in any normal session.
+3. **Study.** You will study the material like in any curriculum session.
 4. **Capture.** The AI asks whether you want to incorporate the learning material into your existing courses or create a special “miscellaneous course” that collects units and concepts that don’t fit into any other course.
 
 ### Learning interface

@@ -1,11 +1,11 @@
-# Explain
+# Ad-hoc session
 
 Teaches what the learner needs to understand one thing they brought: a paper, an autoresearch or
 auto-litreview report, or a project need. Use when the learner says "explain this", "I don't
 follow this report", "help me read <paper>", "what do I need to know to <task>", or "what's in my
 learn queue".
 
-This is not a study session. Nothing is drawn from the scheduler, there is no quiz, and no unit is
+An ad-hoc session is the vault's second kind of session, beside the curriculum session. Nothing is drawn from the scheduler, there is no quiz, and no unit is
 studied. The session teaches the gaps in the learner's understanding of the material, then sorts
 each concept it taught into the systems that already exist: nowhere, a flashcard, a concept on an
 existing unit, or (on a repeat) a new unit. Nothing new is scheduled, so nothing here can build a
@@ -32,7 +32,7 @@ splitting is a missing prerequisite; teach that first.
 
 ## Opening
 
-Run `python3 scripts/explain.py open`. If a session is open on the same material, say so and
+Run `python3 scripts/adhoc.py open`. If a session is open on the same material, say so and
 resume from its cursor unless the learner wants a fresh start.
 
 Otherwise, find the material without asking for anything the vault can reach. When the optional
@@ -111,13 +111,13 @@ proposals. The learner gets one feedback turn, as in `skills/flashcards/SKILL.md
 | needed only for this material or task | nowhere; the session record keeps the explanation |
 | a fact worth keeping fresh, with no unit to hold it | flashcards only (tags below) |
 | part of what an existing unit covers | a new concept on that unit, plus flashcards |
-| taught in an earlier explain session too, with no unit to hold it | see "Promotion" |
+| taught in an earlier ad-hoc session too, with no unit to hold it | see "Promotion" |
 
 **Adding a concept to an existing unit.** Follow `skills/knowledge-map/SKILL.md` for the concept's
 `id`, `kind`, `claim` and `prereqs`, and insert it in sweep order. Set its state to `seen` only
 if the unit has been placed (otherwise leave it `unknown`, and placement will judge it). Add one
 or two bank questions for it through `skills/bank-generator/SKILL.md` and list them in its
-`questions`. Append a unit `log` entry: the date, `what` = "explain session <slug> added <concept
+`questions`. Append a unit `log` entry: the date, `what` = "ad-hoc session <slug> added <concept
 id>", `failed` empty. Leave `srs` and `cursor` alone; the unit itself was not reviewed. A concept
 belongs on a unit only when the unit's reading covers it; a concept that merely relates to a
 course is flashcards-only.
@@ -141,13 +141,13 @@ when the learner will cite it.
 
 ## 4. Record
 
-Write `sessions/<YYYY-MM-DD-HHMM>-explain-<slug>.md`, where the slug names the material in a few
-kebab-case words. It opens with front matter, which `scripts/explain.py` reads and
+Write `sessions/<YYYY-MM-DD-HHMM>-adhoc-<slug>.md`, where the slug names the material in a few
+kebab-case words. It opens with front matter, which `scripts/adhoc.py` reads and
 `scripts/check_vault.py` validates:
 
 ```
 ---
-kind: explain
+kind: adhoc
 title: Product quantization in the vector-search report
 source_kind: report
 source: https://raindrop.io/... (or a vault path, or the project need in one line)
@@ -159,7 +159,7 @@ cursor: inverted-file-index (IVF probing next)
 
 - `source_kind` is `paper`, `report`, `project` or `other`.
 - `topics` lists every concept taught, as short kebab-case topic names. Run
-  `python3 scripts/explain.py topics` first and **reuse an existing name** whenever it fits;
+  `python3 scripts/adhoc.py topics` first and **reuse an existing name** whenever it fits;
   promotion counts exact matches. Known concepts that only got a reminder are not topics.
 - `status` is `open` while the goal question is unanswered and the learner may come back, `done`
   otherwise. An open record needs `cursor`: the concept reached and what comes next.
@@ -169,7 +169,7 @@ learner's answers verbatim, the sources named, and the sorting with what the lea
 (card note ids, concept ids, bank ids). Quote no more of an internal document than the
 explanation needs; the material lives in Raindrop or on disk.
 
-Then ship as in `skills/session/SKILL.md` → "gtg", with PR title `explain-<slug>: <what was
+Then ship as in `skills/session/SKILL.md` → "gtg", with PR title `adhoc-<slug>: <what was
 taught>`.
 
 ## Source-specific notes
@@ -199,7 +199,7 @@ flashcards.
 
 ## Promotion
 
-A topic deserves a home in `units.json` only once it comes back. `python3 scripts/explain.py
+A topic deserves a home in `units.json` only once it comes back. `python3 scripts/adhoc.py
 topics` lists each topic with the dates of the sessions that taught it and flags those taught
 more than once. At "gtg", if a topic in this session is flagged and has no unit, propose a home
 alongside the other destinations:
@@ -210,11 +210,11 @@ alongside the other destinations:
 - **A new unit in `courses/adhoc/`**, the catch-all for topics with no course. Create the course
   on first use: header `course: adhoc`, `title: Ad hoc topics`, `share: 0` (never drawn for
   study, so the other shares need no change), `default_priority: 5`, and `notes` saying units
-  here come from explain sessions. Unit ids start with `adhoc-`, so the recent course mix
-  counts their study sessions. Its units' questions are still quizzed like any other unit's.
+  here come from ad-hoc sessions. Unit ids start with `adhoc-`, so the recent course mix
+  counts their curriculum sessions. Its units' questions are still quizzed like any other unit's.
 
 A unit cut this way follows the normal unit rules. Its `reading` names a real source (a vault
-file, or the primary reference the sessions cited); the explain records go in `also_read`. Cut
+file, or the primary reference the sessions cited); the ad-hoc session records go in `also_read`. Cut
 its concepts from what the sessions taught plus what the source covers. Place it with the taught
 concepts `seen` and the rest `unseen`, then record one review with `python3 scripts/review.py
 <course>:<unit-id> partial --seen <taught concept ids>`, so its questions start entering the quiz.
@@ -228,6 +228,6 @@ A unit in `courses/adhoc/` that grows into a subject of its own moves to a real 
 
 This section needs the optional Raindrop integration. Material the learner wants to understand
 later is tagged `learn` in Raindrop. Nothing surfaces the
-queue on its own: the study session never mentions it, so it cannot become a debt. When the
+queue on its own: the curriculum session never mentions it, so it cannot become a debt. When the
 learner asks what is in it, list the bookmarks with that tag, one line each, and let them pick.
 When a session on one finishes with `status: done`, remove its `learn` tag.
