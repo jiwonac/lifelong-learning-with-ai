@@ -29,7 +29,7 @@ noise to each urgency (`units.UNIT_NOISE`, `--noise`) so the same few units do n
 inside a course. The quiz draw takes no noise.
 
 Urgency is `(1 - retrievability) x priority` and there is no due date anywhere in here. See
-scripts/units.py and SCHEMA.md.
+scripts/units.py and CLAUDE.md.
 
 Usage:
     python3 scripts/session.py              # what the tutor opens with

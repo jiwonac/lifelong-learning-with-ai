@@ -174,12 +174,12 @@ def check_banks(vault, banks, rep, strict_refs=False):
 
 VALID_CONCEPT_STATES = {"unknown", "unseen", "seen"}
 READING_STATUS = {"present", "missing"}
-UNIT_CONCEPTS_WARN = 25    # SCHEMA.md: a unit is 1-4 hours to cover once, ~6-20 concepts
+UNIT_CONCEPTS_WARN = 25    # CLAUDE.md: a unit is 1-4 hours to cover once, ~6-20 concepts
 UNIT_CONCEPTS_ERROR = 35
 
 
 def check_units(vault, questions, rep):
-    """units.json per course — the vault's one scheduled object. See SCHEMA.md."""
+    """units.json per course — the vault's one scheduled object. See CLAUDE.md."""
     all_units, prereq_refs = {}, {}
     for cname, _d, archived in course_dirs(vault):
         uf = _d / "units.json"
@@ -276,7 +276,7 @@ def check_units(vault, questions, rep):
                 rep.error("unit-concept", f"{where}: repeats a concept id")
             if len(cids) > UNIT_CONCEPTS_ERROR:
                 rep.error("unit-size", f"{where}: {len(cids)} concepts — far past the "
-                          f"1-4 hour unit size; split it (SCHEMA.md)")
+                          f"1-4 hour unit size; split it (CLAUDE.md)")
             elif len(cids) > UNIT_CONCEPTS_WARN:
                 rep.warn("unit-size", f"{where}: {len(cids)} concepts — above the "
                          f"{UNIT_CONCEPTS_WARN} that fits a 1-4 hour unit; consider splitting")

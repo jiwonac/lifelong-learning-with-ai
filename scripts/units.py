@@ -3,7 +3,7 @@
 Shared access to courses/<slug>/units.json — the vault's one scheduled object.
 
 The unit is the atom. A course is a directory of units plus the material they share; nothing
-else carries schedulable state. See SCHEMA.md.
+else carries schedulable state. See CLAUDE.md.
 
 Two things in here are load-bearing and deliberately not stored anywhere:
 
@@ -121,7 +121,7 @@ def priority(u):
 
 
 def stage(u):
-    """unknown -> new -> learning -> learned. Order of evaluation matters; see SCHEMA.md.
+    """unknown -> new -> learning -> learned. Order of evaluation matters; see CLAUDE.md.
 
     Note what this ratchet guarantees: `srs.reps` only ever increases, so a unit that has reached
     `learning` can never fall back to `new` or `unknown`. Demoting a concept moves a unit from
@@ -329,7 +329,7 @@ def course_prefixes(include_archived=False):
 def recent_study_courses(window=SHARE_WINDOW, include_archived=False):
     """The course of each of the last `window` study sessions, oldest last.
 
-    Read off the `sessions/` filenames, which SCHEMA.md fixes as
+    Read off the `sessions/` filenames, which CLAUDE.md fixes as
     `<YYYY-MM-DD[-HHMM]>-<unit-id>.md`. **Nothing schedules on this.** The course draw is
     independent of history by design; this exists so `session.py` can show what the recent mix
     actually was, which is what the learner needs in order to decide whether to override the draw.

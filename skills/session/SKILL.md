@@ -210,7 +210,7 @@ step if you would rather review each session's changes yourself.
 1. `python3 scripts/check_vault.py` — zero errors, or stop and report instead of merging.
 2. Commit everything outstanding on the session's branch and push it.
 3. Open a PR into `main` (title `<unit-id>: <what happened>`, body = the `log` entry) and merge it
-   with a merge commit, matching the existing history. Use the GitHub MCP tools where they exist (cloud
+   with a merge commit, not a squash: the per-concept commits are the cursor's audit trail. Use the GitHub MCP tools where they exist (cloud
    sessions), `gh pr create` / `gh pr merge --merge` otherwise (local sessions).
 4. Report the PR link and that it merged, in one line.
 

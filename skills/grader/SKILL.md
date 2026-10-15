@@ -35,7 +35,7 @@ discontinuity called "no discontinuity," a theorem's hypothesis dropped from its
 is not a model gap worth demoting a concept over, and it is not nothing either. Author a
 `definition`-type question isolating exactly that fact, append it to the course's `bank.jsonl`,
 and link its id onto the concept's `questions` array so the SRS picks it up going forward. This is
-what `SCHEMA.md` means by "factual recall is a question type, not a separate object" — the fix for
+what `CLAUDE.md` means by "factual recall is a question type, not a separate object" — the fix for
 a vocabulary miss is a question, not a flashcard.
 
 ## Classify every miss before recording it

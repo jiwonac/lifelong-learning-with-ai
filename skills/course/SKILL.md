@@ -30,7 +30,7 @@ Two courses may legitimately reference the same unit: a databases course and an 
 retrieval course might both want Fagin's Threshold Algorithm. That is fine and is a reason the unit, not the course, is the
 atom.
 
-See `SCHEMA.md` for every field. This file is about judgement, not format.
+See `CLAUDE.md` for every field. This file is about judgement, not format.
 
 ## Creating a course
 

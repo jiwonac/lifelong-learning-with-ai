@@ -137,3 +137,7 @@ is how the next paper survey knows what is already carded.
 - Review on whichever device, whenever you like. The agent never schedules your reviews.
 - Cloud sessions, and any session where Anki is not reachable, still work for studying. They
   just skip every flashcard step.
+  A cloud container cannot reach Anki on your machine, and AnkiWeb's terms rule out
+  third-party sync clients, so there is no way around this short of running the session locally.
+- If the agent cannot reach AnkiConnect right after you install it, quit Anki completely and
+  start it again. The add-on does not load until Anki has fully restarted.

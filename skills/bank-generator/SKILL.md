@@ -79,7 +79,7 @@ source material actually covers)**. Concretely:
    `courses/system-design/sources/data-intensive-applications.pdf#Ch5 Replication > Leaders and Followers`.
    Use the real chapter/section title from the source, not just a page number.
 7. Append (don't overwrite) new entries to `courses/<slug>/bank.jsonl`, following
-   `SCHEMA.md`. Assign IDs as `<topic>-<zero-padded sequential number>`, continuing from the
+   `CLAUDE.md`. Assign IDs as `<topic>-<zero-padded sequential number>`, continuing from the
    highest existing ID. Never rewrite an existing entry in place except to fix a factual error —
    units and past sessions reference questions by id. `check_vault.py` requires every entry to
    carry `id`, `topic`, `subtopic`, `type`, `question`, `answer_key`, `source_ref`, `difficulty`

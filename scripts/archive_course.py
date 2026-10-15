@@ -5,7 +5,7 @@ source_ref that names its old path in the same operation.
 
 Archiving is a move, not a delete -- the bank stays intact because its questions are still
 referenced from sessions/ and from the unit that owns each one; a moved course is still fully
-discoverable by check_vault.py, just excluded from scheduling. See SCHEMA.md and
+discoverable by check_vault.py, just excluded from scheduling. See CLAUDE.md and
 check_vault.py's course_dirs(): location under courses/_archive/ is what makes a course archived,
 nothing in the data itself. Priority becomes moot the moment a course is archived --
 scripts/units.py only loads live courses, so nothing needs to change there.
