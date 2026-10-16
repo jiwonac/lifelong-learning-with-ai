@@ -1,10 +1,22 @@
-# AI Driven Learning Vault
+# Lifelong Learning with AI
 
-This custom learning system equips AI agents with learning science principles and a structured personal learning curriculum.
-I use it to learn new topics for my PhD and personal projects, and I've refined the prompts through extensive use.
-I recommend this as a starting point for self-driven learning, especially when human-created, pedagogically friendly learning materials don’t exist, such as for bespoke personal learning or expert-level learning.
+As a PhD student with tons of interests within and outside of my work, I spend a lot of time learning tough subjects. 
+When LLMs became really good I experimented quite a bit to incorporate AI into my learning workflow. 
+Unfortunately, the default fine-tuned behavior of general-purpose AI assistants is terrible for learning.
+That said, with a lot of harnesses and modifications to the default AI behavior, I think AI is very useful for self-motivated, self-driven, lifelong learning. 
+This is especially true when human-curated, pedagogically friendly learning materials don't exist, such as for bespoke personal learning or expert-level learning.
+
+I have an amateur level of interest in learning science. 
+Shout out to Dr. Benjamin Keep for teaching me everything I know about learning via his online resources. 
+I've tried my best to adhere to the foundational, keystone findings of that field. 
 
 ## General Principles
+
+### Reap the benefits of AI
+
+- The AI handles menial tasks, like processing long documents and bookkeeping. 
+- The AI creates bespoke learning materials for personalized needs using any resource that might not be written in a pedagogically friendly way. 
+- The AI maximizes desirable difficulty via generative quizzes, and adjusts the difficulty of problems and exposition based on the learner's performance. 
 
 ### Align AI with learning science.
 
@@ -30,7 +42,7 @@ Self-driven learning is rarely that simple! Learning projects can vary widely in
 2. Unstructured: You were thrown a web article by your boss to learn today. Or you might choose the day's learning topic based on serendipitous whims.
 3. Microlearning: You have five minutes and want to use that time productively.
 
-This learning vault can handle all three levels of structure using three different types of learning structure:
+This learning vault can handle all three levels of structure:
 
 1. **Curriculum mode.** You design a personal course with units, with quizzes at the start and end of each unit.
 2. **Ad-hoc mode.** You give the AI a one-off material to learn. After the learning session, you can incorporate any relevant concepts into existing courses.
@@ -48,6 +60,12 @@ After taking the final exam, you might forget a course's material altogether.
 I don't think that's the goal of self-driven learning! In this system, you will always review all courses and units you’ve already learned during regular interviews. You can start or stop learning a course as your priorities change, and learn as many or as few courses simultaneously as you like.
 
 When you encounter something new to learn, it will be added as a unit or a concept to an existing course.
+
+### Limitations
+
+- This vault can't help you **transfer** learnings to real-world projects. Go make stuff!
+- This vault has largely been developed to help me learn technical topics like mathematics, computer science, software development, and similar topics. I don't think that the systems that I created apply very well to motor skills or using professional or multimedia software, for example. It might apply to humanities and social sciences with some modification. 
+- Using this vault effectively requires you to have a pro or max subscription to Claude or ChatGPT, and to be able to interface with git/GitHub in some manner. 
 
 ## Getting started
 
