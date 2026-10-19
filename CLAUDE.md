@@ -21,7 +21,8 @@ The system’s design follows two guiding principles:
 | a new course, a reading list, new sources, re-cut units | `skills/course/SKILL.md`, then `skills/knowledge-map/SKILL.md` and `skills/bank-generator/SKILL.md` |
 | anything about Anki flashcards | `skills/flashcards/SKILL.md` (setup: `SETUP.md` beside it) |
 | “gtg”, “I’ve got to go”, “end session” | `skills/session/SKILL.md` → “gtg”, at once, mid-question if need be |
-| writing any prose: teaching, session records, skills, docs | `skills/clear-writing/SKILL.md` |
+| writing teaching prose: lessons, explanations, worked examples | `skills/math-writing/SKILL.md` |
+| writing any other prose: session records, skills, docs | `skills/clear-writing/SKILL.md` |
 
 ## Universal Rules
 
@@ -32,7 +33,7 @@ The system’s design follows two guiding principles:
 5. `scripts/review.py` **is the only writer of SRS numbers.** Never hand-edit them.
 6. `scripts/check_vault.py` **must report 0 errors** after any structural change and before any merge.
 7. **Three levels of abstraction only:** course, unit, concept.
-8. **Write for humans.** Teaching prose, and every skill or doc you add or edit in this repo, follows `skills/clear-writing/SKILL.md`. Keep skills succinct: one sentence per line, plain words, numbered steps for procedures, no history of past designs. A learner who wants to change how the vault works should be able to read any skill.
+8. **Write for humans.** Teaching prose follows `skills/math-writing/SKILL.md`. Every skill or doc you add or edit in this repo follows `skills/clear-writing/SKILL.md`. Keep skills succinct: one sentence per line, plain words, numbered steps for procedures, no history of past designs. A learner who wants to change how the vault works should be able to read any skill.
 
 ## How a session runs
 
@@ -124,6 +125,7 @@ vault/
     flashcards/      # optional Anki cards from sessions and work papers; SETUP.md
     ad-hoc/          # ad-hoc session: teach the gaps in a paper, report or project need, then sort them
     clear-writing/   # how to write anything a human reads, including these skills
+    math-writing/    # how to write teaching prose, modeled on Cummings's Long-Form textbooks
   scripts/
     session.py       # the scheduler: quiz draw + study pick
     units.py         # shared access to units.json; stage, urgency, eligibility, review

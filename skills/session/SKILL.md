@@ -96,6 +96,11 @@ Publish the question, then say it is up.
 Publish the grading, then say how it routed.
 If a chat turn contains a `$`, a `\frac`, a subscript, or a shape described in words, it is in the wrong place.
 
+**The page reads top to bottom in time order, and what is live is always at the bottom.**
+A fixed header (goal, overview, concept map) may sit above the record.
+Below it, each lesson sits directly above the question it prepares, each answer and its grading directly below that question, and the next lesson below the grading.
+Never keep a separate "live" section higher up, and never post a lesson in one place and its question in another.
+
 **Record answers verbatim**, including any wrong turn before the learner self-corrected.
 The wrong turn is usually the diagnostic part, and without it a later reader cannot tell decay from a bad cut.
 

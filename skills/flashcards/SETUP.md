@@ -26,7 +26,6 @@ Step 2 is only for Claude Code in WSL2 on Windows.
 
    ```css
    .src  { font-size: 0.65em; opacity: 0.6; }   /* source line on the front */
-   .expl { font-size: 0.8em;  opacity: 0.6; }   /* easy explanation on the back */
    .ttl  { font-family: Georgia, "Times New Roman", serif; font-style: italic; }  /* paper title in a question */
    ```
 6. The agent sorts cards into subdecks of `Vault` with `scripts/anki_decks.py` (see `SKILL.md` → "Plumbing") and gives each new subdeck the `Vault` preset, because a subdeck does not inherit its parent's preset.

@@ -24,6 +24,8 @@ The agent writes and manages every card; the learner only reviews, and approves 
 
 ## Writing a card
 
+These rules draw on Wozniak's "Twenty rules of formulating knowledge", Nielsen's "Augmenting Long-term Memory" and Matuschak's "How to write good prompts".
+
 The bar: once the concept is understood, the card takes a few seconds and is usually right (**3 out of 5**).
 A card that asks for a derivation step, an exact constant, or a condition the learner has to reason out is a 4; split it, or move it to the bank.
 
@@ -34,6 +36,8 @@ A card that asks for a derivation step, an exact constant, or a condition the le
 
   Cut words from the back, never from the cue.
 - **One fact per card.** A front that would take "and" to answer is two cards. Count and structure are separate facts ("how many products" and "which entries each product takes"), even when one formula answers both.
+- **Understood first.** Card only what the learner can explain now. A card on an idea they never grasped goes to pending (see "Pending"), and the idea goes in the ad-hoc learn queue (`courses/adhoc/sources/`).
+- **Worth knowing in a year.** Card a fact only if recalling it would save the learner time later, or it is striking. Skip trivia such as awards, or which systems descended from a paper.
 - **Standalone.** New cards come up in random order, so every card is answerable on its own. Name the object; never "this theorem", "the above", "in the paper".
 - **The field's own terms.** "the determinant of a square matrix", not "an n-by-n determinant".
 - **Foundations first.** Define every nontrivial term a card uses on its own card, unless an existing card already does. Cover the family as well as the member (removable discontinuities, plus what a discontinuity is and the other types). Before carding a miss, card the plain definitions it rests on: a miss on Newton's method needs "what is Newton's method" before "why the Hessian must be positive definite".
@@ -46,7 +50,8 @@ A card that asks for a derivation step, an exact constant, or a condition the le
   - from a course: `<div class="src">Database Internals — Relational model: relations, schemas, keys.</div><br>…` (the course `title` and the unit `title`, not bold);
   - from a paper: `<div class="src"><b>ColBERT</b>: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT. Khattab & Zaharia. (2020)</div><br>…` (the title; up to three author surnames, otherwise "Carlini et al."; the year). **Bold only the short title**, in place if the title contains it. If the paper is known by a name not in its title, put the name first: `<b>TracIn</b> · Estimating Training Data Influence by Tracing Gradient Descent. …`. With no short title, nothing is bold.
 - **One question, at most one sentence after the source line.**
-- **Name papers by their short title, not by their authors**: the paper's own name (BEIR), the full title when short, or a token phrase cut from it ("Debunking the Myth of Join Ordering"). Wrap it in `<span class="ttl">…</span>`, in contrasts too. Fall back to "Smith et al." only for a long title with no name.
+- **Name papers by their short title, not by their authors**: the paper's own name (BEIR), the full title when short, or a token phrase cut from it ("Debunking the Myth of Join Ordering"). Wrap it in `<span class="ttl">…</span>`, in contrasts too. Fall back to "Smith et al." for a long title with no name, or when the short title makes the sentence awkward ("George et al.'s mislabel detection framework", "Freitag et al. run TPC-H").
+- **File a claim under the paper that makes it.** A finding BEIR reports about ColBERT is a BEIR card, with BEIR's source line and tag.
 - **Bold the tested keyword** with `<b>…</b>` (**Quotient Law**, **one-sided limit**). When the thing tested is a formula, bold the word that tells it apart from its neighbours, such as **informally** against the ε-δ card.
 - **No maths in the front unless the question needs it.** "When does the two-sided limit exist" needs no formula; "Why does the Quotient Law need \(\lim g\neq0\)" does.
 
@@ -54,19 +59,22 @@ A card that asks for a derivation step, an exact constant, or a condition the le
 
 - **Terse.** The answer is the shortest phrase that is still correct, usually under 15 words. Fragments are fine. Cut lead-ins ("It is", "Claims:"), restatements of the question, hedges and side-notes.
 - **Two parallel items → `<ul><li>…</li></ul>`**, one fragment per item. Three or more go to cloze (below).
-- **Diagrams for geometric ideas** (a tangent line, a squeeze between two curves): a small inline SVG under the answer, at most about six labelled elements, `viewBox` set, width about 240px, strokes and text in `currentColor` for night mode, plain-text labels (MathJax does not render inside SVG).
-- **Easy explanation under the answer.** Leave one empty line, then `<div class="expl">…</div>`: 1–3 short sentences (about 20–50 words) of intuition or a tiny example, not a rewording of the answer. On paper cards, keep the attribution and add no claims beyond the card and widely known facts. The empty line is `<br><br>` after plain text, `<br>` after a diagram's `</div>`, and nothing after a `</ul>`. Full back: `First formalism with … parameters.<br><br><div class="expl">Before LOTUS, "ask an LLM about each row" had no …</div>`.
+- **Diagrams for geometric ideas** (a tangent line, a squeeze between two curves): a small inline SVG under the answer, wrapped in `<div class="diagram">`, separated from the answer by `<br>`, at most about six labelled elements, `viewBox` set, width about 240px, strokes and text in `currentColor` for night mode, plain-text labels (MathJax does not render inside SVG).
+- **No explanation prose.** The back holds the answer, plus a diagram where one helps, and nothing else.
 - **Maths in MathJax**: `\(...\)` inline, `\[...\]` display. Never `$`.
 
 ### Cloze notes
 
-Cloze notes follow every rule above. `Text` opens with the source line, then `<br>`, then the sentence; no deletion contains `::` or `}}`; `Back Extra` holds the `<div class="expl">`.
+Cloze notes follow every rule above. `Text` opens with the source line, then `<br>`, then the sentence; no deletion contains `::` or `}}`; `Back Extra` stays empty unless it holds a diagram.
 Anki makes one card per deletion number, and deletions that share a number hide together.
 
 - **Lists of three or more** are always cloze. Never ask for an unprompted list of three or more. One sentence names the list and its size: `<span class="ttl">BEIR</span> varies along four <b>dimensions</b>: {{c1::task}}, {{c2::domain}}, {{c3::corpus size}} and {{c4::query and document length}}.` Delete every item for course material and `***`/`****` papers, and only the least obvious one for `*`/`**` papers. Scope the stem so the list is complete ("C-Store's three storage novelties"), and keep visible any cue word the hidden item needs.
+- **Short deletions.** A deletion hides a few words, never a clause or a chain of reasons. Split a causal chain into one card per link.
+- **Cue each list item** when the stem alone does not narrow it, with its category in parentheses: `rejects two explanations for the tree–NN gap: (data) {{c1::categorical features}}; (training) {{c2::insufficient hyperparameter tuning}}`.
+- **Long items go in a lettered list** (`<ol type="a">`), one item per line, with a name and its meaning as separate deletions: `<li>{{c1::Reservation}}: {{c2::slots held for tokens not yet generated}}.</li>`.
 - **Contrasts whose answer names both sides** are always cloze, one deletion per side: `Whereas <span class="ttl">LOTUS</span> runs semantic operators on {{c1::pandas dataframes}}, <span class="ttl">Cortex AISQL</span> runs them in {{c2::a distributed SQL engine}}.` A contrast that asks for one side only ("What does ThalamusDB guarantee, unlike SUPG's precision targets?") stays Basic.
 - **Closely related questions** that each need the others as context go in one short paragraph with a deletion per question, so the context is written once: "The <b>Leibniz formula</b> expresses the determinant as a sum over permutations. There are {{c1::\(n!\)}} terms because there are that many {{c1::permutations of the columns}} … Formally, \(\det A=\){{c2::\(\sum_{\sigma\in S_n}\operatorname{sign}(\sigma)\prod_i a_{i\,\sigma(i)}\)}}." Any term the paragraph uses but does not define gets its own card.
-- **A single fact** may be cloze when stating the setting as a sentence is clearer than a Basic front, and a shared number lets a fact and its reason be one card: "To find the limit \(L\) of a convergent recursive sequence \(a_{n+1}=f(a_n)\), we use the identity {{c1::\(L=f(L)\)}}, which holds since {{c1::if \(a_n=L\) then \(a_{n+1}=L\) also}}." Don't cloze a sentence whose wording gives the answer away, or one memorable only as a phrase.
+- **A single fact** may be cloze when stating the setting as a sentence is clearer than a Basic front, and a shared number lets a fact and its reason be one card, but only when both are short and so tightly linked that testing one alone would give away the other: "To find the limit \(L\) of a convergent recursive sequence \(a_{n+1}=f(a_n)\), we use the identity {{c1::\(L=f(L)\)}}, which holds since {{c1::if \(a_n=L\) then \(a_{n+1}=L\) also}}." Don't cloze a sentence whose wording gives the answer away, or one memorable only as a phrase.
 
 ### Examples
 
@@ -87,7 +95,7 @@ Fronts that failed in review:
 ### What qualifies
 
 - **Yes:** definitions; theorem statements; what one part of a definition or theorem is for; simple applications; steps of a routine computation; the key claim of a seminal paper or textbook section; why a paper or algorithm mattered in its field; and **every miss, distilled**: the idea that was missing, not the question that exposed it.
-- **No:** anything the learner would have to derive at length; anything an existing card covers (search first); unit material the learner has not been taught yet.
+- **No:** anything the learner would have to derive at length; anything an existing card covers (search first), unless it is a foundational concept with naturally different phrasings or interpretations, which rarely holds for a paper card; unit material the learner has not been taught yet.
 
 **Tags.** Every card needs both:
 
@@ -113,7 +121,7 @@ Run this after capture, before shipping (see `skills/session/SKILL.md` → "gtg"
 
 Papers the learner reads for work, outside any course, go into `Vault::Papers` under the same rules and daily cap.
 
-**Only important papers are carded, and the learner picks them** by giving each a star rating from `*` to `****`, which sets the card budget:
+**Only important papers are carded, and the learner picks them** by giving each a star rating from `*` to `****`, which sets the card budget even when it is only one or two cards:
 
 | Stars | Cards | What they cover |
 |---|---|---|
@@ -184,6 +192,8 @@ These are kinds of card the learner suspended as useless. Never write them.
 - **Named baselines.** Card a baseline only when the choice of comparison is itself the argument.
 - **How a survey was assembled.** Card what a survey concludes.
 - **Claims that follow from the premise** ("What cost does Cortex AISQL's planner plan around?" → "LLM inference cost"). Card what the premise does not predict.
+- **Trivia about a paper's legacy** (Codd's Turing Award, the systems that descended from the relational model).
+- **What earlier work could not do** ("What does Abacus optimize that earlier optimizers could not?"). It has several right answers and rests on a contested history; card what the system does.
 - **A paper's headline win on its own benchmark** ("TracIn surfaces mislabels earliest"). Card what an evaluation was designed to show only when the design itself is the contribution.
 
 ## Pre-review of unseen cards

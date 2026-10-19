@@ -9,6 +9,14 @@ A result that does not change what gets asked next wasted the question.
 The verdict, answer key, hint and worked correction go on the session page, with the learner's answer verbatim; chat gets the routing outcome and the ids written.
 See `skills/session/SKILL.md` → **Everything goes in the artifact**.
 
+## Mark up the learner's own work
+
+Correct an answer on the learner's own lines, not in a separate explanation.
+For a worked answer, put it side by side with the correct solution: the learner's lines on the left, the correct lines on the right, row against row, with the parts that differ highlighted in red on both sides.
+For a short answer, show it with the wrong part struck or highlighted and the correct alternative written next to it.
+Then say in a sentence or two why the marked step is wrong.
+On the page, build the comparison as a two-column table whose differing parts sit in `<mark class="diff">`, colored from the page's theme tokens; the table scrolls inside its own box on a phone.
+
 ## Grade generously on substance, strictly on production
 
 The test is whether the user can *produce* the idea, in any words.

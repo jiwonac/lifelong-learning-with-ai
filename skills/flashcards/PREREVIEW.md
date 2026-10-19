@@ -19,6 +19,12 @@ The learner wrote or approved these rewrites; follow their taste.
 - A list card naming items without saying what they are (PagedAttention's three kinds of waste) → pair each name with its meaning, one deletion per item.
 - A paper-framed card about a plain property of a standard metric ("What does nDCG@10 have that precision lacks, per BEIR?") → reject; plain definitions belong in plain cards.
 - Report the terms a cloze paragraph uses but doesn't define; don't invent cards for them.
+- A list the learner cannot recall cold → cue each item with its category: "(data) {{c1::categorical features}}; (training) {{c2::insufficient hyperparameter tuning}}".
+- A long sentence listing named items with meanings → a lettered list, name and meaning as separate deletions.
+- A deletion that hides a causal chain ("varies the positional bias, so errors differ and cancel") → keep the chain visible and delete only the contrast: "{{c1::shuffling the input order}} mitigates positional bias; {{c2::raising temperature}} does not."
+- An awkward short title mid-sentence → "George et al.", "Freitag et al.".
+- A finding of paper B carded under paper A (BEIR's result about ColBERT) → refile it to B.
+- Trivia (awards, descendants) and "what earlier work could not do" → reject.
 
 Reject every kind in SKILL.md → "Cards the learner rejected", plus experimental numbers and material too hard to learn from the card alone.
 For material the learner has not studied (`concept_states` shows `unseen`/`unknown`), keep a card that a reader with the learner's background (for example, CS, databases and ML) could understand from front and back alone.

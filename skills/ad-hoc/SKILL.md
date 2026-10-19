@@ -15,10 +15,14 @@ Teach as in `skills/tutor/SKILL.md`, including "Broad first, then narrow, then b
 ## Opening
 
 1. Run `python3 scripts/adhoc.py open`. If a session is open on the same material, resume from its cursor unless the learner wants a fresh start.
-2. Otherwise, find the material yourself: a file the learner names (usually in `courses/adhoc/sources/`), a URL, or the project need they describe. For a task about code, ask for the repository or file.
-3. Ask **one question in chat**: what the learner needs the material for. For a report, which conclusions they must act on or judge. For a paper, whether they will read it after this (first pass) or already have (debrief). For a project, what they need to be able to do.
+2. Otherwise, find the material yourself, never asking for anything the vault can reach: a file the learner names (usually in `courses/adhoc/sources/`), a URL, or the project need they describe. For a task about code, ask for the repository or file.
+3. Copy a document that lives outside the vault into `courses/adhoc/sources/` and name that copy as the record's `source`. A file in Downloads or a temporary folder can disappear mid-session.
+4. Ask **one message of questions in chat**:
+   - What the learner needs the material for. For a report, which conclusions they must act on or judge. For a paper, whether they will read it after this (first pass) or already have (debrief). For a project, what they need to be able to do.
+   - Which formal frameworks the material leans on they have used in their own work, named concretely (for example Bayesian inference, information theory, asymptotic statistics). Having read about a framework is not having used it.
 
-The answer sets the scope: teach only what that goal depends on.
+The first answer sets the scope: teach only what that goal depends on.
+The second sets the depth: a framework the learner has not used is taught from its basics before anything built on it.
 
 ## 1. Map the concepts
 
@@ -27,10 +31,15 @@ List the concepts the scoped material depends on, in prerequisite order, and che
 | evidence | treat as |
 |---|---|
 | a concept in some `courses/*/units.json` with state `seen` | known: one-line reminder, naming its unit |
-| a card in the Vault deck (`findNotes`, `deck:Vault <term>`) | known: one-line reminder |
+| a card in the Vault deck (`findNotes`, `deck:Vault <term>`) | known at the depth the card shows: one-line reminder |
 | a concept with state `unseen` or `unknown`, or no trace | to teach |
 
-In the narrow pass, open each "to teach" concept with one quick generative check; a correct answer moves it to known.
+Evidence shows a concept at the depth it was learned, and no deeper.
+Cards from a paper the learner skimmed for its methods show they know what the method does, not that they can work its mathematics.
+When the material needs more depth than the evidence shows, treat the concept as "to teach" and open it with one quick generative check.
+Do not re-test known concepts the material uses only at the depth already shown; testing everything wastes the session.
+
+In the narrow pass, open each "to teach" concept with one quick conceptual question or a self-report (`skills/tutor/SKILL.md` → "Checking prerequisites"); a correct answer moves it to known.
 Publish the map in the artifact before teaching: the goal, the known concepts with reminders, and the concepts to teach.
 For a long document, have a subagent return the concepts, the claims resting on each, and the passages using them.
 
