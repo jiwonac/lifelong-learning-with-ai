@@ -7,7 +7,6 @@ That said, with a lot of harnesses and modifications to the default AI behavior,
 This is especially true when human-curated, pedagogically friendly learning materials don't exist, such as for bespoke personal learning or expert-level learning.
 
 I have an amateur level of interest in learning science. 
-Shout out to Dr. Benjamin Keep for teaching me everything I know about learning via his online resources. 
 I've tried my best to adhere to the foundational, keystone findings of that field. 
 
 ## General Principles
